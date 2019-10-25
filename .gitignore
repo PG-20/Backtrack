@@ -1,1 +1,6 @@
+.idea/
 db.sqlite3
+**/migrations
+venv
+**/__pycache__
+.vscode/
