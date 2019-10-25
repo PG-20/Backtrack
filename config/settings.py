@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'products',
     'productBacklog',
+    'crispy_forms'
 ]
 
 MIDDLEWARE = [
@@ -126,3 +127,4 @@ STATIC_ROOT = ''
 STATIC_URL = '/static/'
 
 STATICFILES_DIRS = (os.path.join('static'),)
+CRISPY_TEMPLATE_PACK = 'bootstrap4'

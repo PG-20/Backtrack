@@ -21,5 +21,6 @@ from productBacklog.views import product_backlog_view
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.index, name='index'),
+    path('/index', views.index, name='index'),
     path('product_backlog/', product_backlog_view, name='product_backlog')
 ]
