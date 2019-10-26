@@ -13,7 +13,12 @@
         <div class="row">
             <div class="col-3">
                 {{form.effort|as_crispy_field}}
+
             </div>
+            <div class="col-3">
+                    {{form.effort_done|as_crispy_field}}
+                    
+                </div>
             <div class="col-3">
                 {{form.story_points|as_crispy_field}}
             </div>

@@ -13,7 +13,7 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    pbis = ProductBacklog.objects.all()
+    pbis = ProductBacklog.objects.all().order_by('priority','last_updated')
     context = {'title': "Product Backlog", 'pbis': pbis}
     return render(request, 'product_backlog.html', context)
 

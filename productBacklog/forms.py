@@ -10,6 +10,7 @@ class ProductBacklogForm(forms.ModelForm):
             'title',
             'effort',
             'story_points',
+            'effort_done',
             'status',
             'pbi_type',
             'main_dev',

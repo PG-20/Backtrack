@@ -5,11 +5,11 @@ from django.urls import reverse
 # Create your models here.
 
 class ProductBacklog(models.Model):
-    product=models.ForeignKey(Product, on_delete=models.CASCADE, default=1)
+    # product=models.ForeignKey(Product, on_delete=models.CASCADE) commented for now
     title=models.CharField(max_length=100)
     effort=models.IntegerField()
     story_points=models.IntegerField()
-    effort_done=models.IntegerField()
+    effort_done=models.IntegerField(default=0)
     status=models.CharField(max_length=2,choices=[('TD','To-Do'),('P','In Progress'),('D','Done')],default='TD')
     last_updated=models.DateTimeField(auto_now=False,auto_now_add=False,default=datetime.now())
     pbi_type=models.CharField(max_length=2,choices=[('B','Bug'),('E','Epic'),('US','User Story')],default='US')
