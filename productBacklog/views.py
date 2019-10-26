@@ -13,7 +13,7 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    pbis = ProductBacklog.objects.all().order_by('priority','last_updated')
+    pbis = ProductBacklog.objects.all().order_by('priority', 'last_updated')
     context = {'title': "Product Backlog", 'pbis': pbis}
     return render(request, 'product_backlog.html', context)
 
@@ -46,4 +46,11 @@ def EditPBI(request, *args, **kwargs):
     }
 
     return render(request, "add_product_backlog_item.html", context)
+
+def DeletePBI(request, pk):
+    ProductBacklog.objects.get(pk=pk).delete()
+    return HttpResponse(pk)
+
+
+
 

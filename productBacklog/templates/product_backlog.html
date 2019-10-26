@@ -5,8 +5,8 @@
 {% block content %}
     <div>
         {% if pbis %}
-        <table class="table table-hover">
-            <thead>
+            <table class="table table-hover">
+                <thead>
                 <tr>
                     <th scope="col">#</th>
                     <th scope="col">Title</th>
@@ -15,25 +15,43 @@
                     <th scope="col">Sprint</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
+                    <th scope="col">Action</th>
                 </tr>
-            </thead>
-            <tbody>
-            {% for pbi in pbis %}
-                <tr onclick="location.href = '{% url "edit-pbi" pbi.id %}'">
-                    <th scope="row">{{ pbi.id }}</th>
-                    <td>{{ pbi.title }}</td>
-                    <td>{{ pbi.last_updated }}</td>
-                    <td>{{ pbi.story_points }}</td>
-                    <td>{{ pbi.sprint_no | default:'-' }}</td>
-                    <td>{{ pbi.priority | default:'-' }}</td>
-                    <td>{{ pbi.get_status_display }}</td>
-                </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                {% for pbi in pbis %}
+                    <tr onclick="location.href = '{% url "edit-pbi" pbi.id %}'" id="row{{ pbi.id }}">
+                        <th scope="row">{{ pbi.id }}</th>
+                        <td>{{ pbi.title }}</td>
+                        <td>{{ pbi.last_updated }}</td>
+                        <td>{{ pbi.story_points }}</td>
+                        <td>{{ pbi.sprint_no | default:'-' }}</td>
+                        <td>{{ pbi.priority | default:'-' }}</td>
+                        <td>{{ pbi.get_status_display }}</td>
+                        <td><button onclick="onDelete(event, {{ pbi.id }})" class="btn btn-danger">🗑️</button></td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
         {% endif %}
-        <a href="{% url "add-pbi"%}">
+        <a href="{% url "add-pbi" %}">
             <button>Add PBI</button>
         </a>
     </div>
+    <script>
+        function onDelete(e, id){
+            e.stopPropagation();
+            e.preventDefault();
+
+            $.ajax({
+                url: "delete/"+id,
+                success: function (del_id) {
+                    if (id==del_id) {
+                        $("#row"+id).remove();
+                        alert("Successfully deleted")
+                    }
+                }
+            });
+        }
+    </script>
 {% endblock %}
