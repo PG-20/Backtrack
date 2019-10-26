@@ -1,12 +1,8 @@
-{%extends 'base.html'%}
+{%extends 'base.html' %}
 
 {% load crispy_forms_tags %}
 {%block content%}
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
-<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
-<form method='POST'>
+<form method='post'>
     {%csrf_token%}
     <div class="col">
         <div class="row">
@@ -21,25 +17,13 @@
             <div class="col-3">
                 {{form.story_points|as_crispy_field}}
             </div>
-            <div class="col-3">
-                {{form.effort_done|as_crispy_field}}
-            </div>
-
         </div>
         <div class="row">
             <div class="col-3">
                 {{form.status|as_crispy_field}}
+            </div>
+            <div class="col-3">
                 {{form.pbi_type|as_crispy_field}}
-                {{form.sprint_no|as_crispy_field}}
-
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                {{form.main_dev|as_crispy_field}}
-            </div>
-            <div class="col-3">
-                {{form.other_dev|as_crispy_field}}
             </div>
         </div>
         <div class="row">
@@ -47,17 +31,19 @@
                 {{form.priority|as_crispy_field}}
             </div>
         </div>
-
+        <div class="row">
+            <div class="col-3">
+                {{form.main_dev|as_crispy_field}}
+                {{form.other_dev|as_crispy_field}}
+            </div>
+        </div>
         <div class="row">
             <div class="col-md-3">
                 <button type="submit" class="btn btn-success">Save </button>
             </div>
         </div>
-    </div>
 
     </div>
-    <!-- {{form|crispy}} -->
-    <!-- <input type='submit' value='Save'/> -->
 
 </form>
 

@@ -1,0 +1,39 @@
+
+
+{% extends "base.html" %}
+
+{% block content %}
+    <div>
+        {% if pbis %}
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Last Updated</th>
+                    <th scope="col">Story Points</th>
+                    <th scope="col">Sprint</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+            {% for pbi in pbis %}
+                <tr onclick="location.href = '{% url "edit-pbi" pbi.id %}'">
+                    <th scope="row">{{ pbi.id }}</th>
+                    <td>{{ pbi.title }}</td>
+                    <td>{{ pbi.last_updated }}</td>
+                    <td>{{ pbi.story_points }}</td>
+                    <td>{{ pbi.sprint_no | default:'-' }}</td>
+                    <td>{{ pbi.priority | default:'-' }}</td>
+                    <td>{{ pbi.get_status_display }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% endif %}
+        <a href="{% url "add-pbi"%}">
+            <button>Add PBI</button>
+        </a>
+    </div>
+{% endblock %}
