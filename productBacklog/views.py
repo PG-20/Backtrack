@@ -1,6 +1,8 @@
 from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView, CreateView
 from django.http import HttpResponse
+from django.forms.models import model_to_dict
+from datetime import datetime
 
 from .models import ProductBacklog
 from .forms import ProductBacklogForm
@@ -13,38 +15,54 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    pbis = ProductBacklog.objects.all().order_by('priority', 'last_updated')
-    context = {'title': "Product Backlog", 'pbis': pbis}
+    pbis = ProductBacklog.objects.all().order_by('priority', '-last_updated')
+    skip=False
+    for i in range(len(pbis)):
+        if skip:
+            skip=False
+            continue
+        if i+1 < len(pbis) and pbis[i].priority == pbis[i+1].priority:
+            pbis[i+1].priority = i+1
+            pbis[i+1].save()
+            skip=True
+            continue
+        print(i)
+        pbis[i].priority = i+1
+        pbis[i].save()
+    context = {'title': "Product Backlog", 'pbis': pbis.order_by('priority')}
     return render(request, 'product_backlog.html', context)
 
 
-def AddPBI(request, *args, **kwargs):
-    form = ProductBacklogForm(request.POST or None)
-    if form.is_valid():
+class AddPBIView(CreateView):
+    form_class = ProductBacklogForm
+    template_name = 'add_product_backlog_item.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['label'] = "Add PBI"
+        context['url'] = self.request.get_full_path()
+        return context
+
+    def form_valid(self, form):
         form.save()
-        context = {}
-        # form.ProductBacklogForm()
-        return redirect('index')
-    context = {
-        "form": form,
-        "title": "Add PBI"
-    }
+        return render(self.request, 'updateSuccess.html')
 
-    return render(request, "add_product_backlog_item.html", context)
 
-def EditPBI(request, *args, **kwargs):
+def EditPBIView(request, *args, **kwargs):
     pbi=ProductBacklog.objects.get(pk=kwargs['pk'])
     form = ProductBacklogForm(request.POST or None, instance=pbi)
-    if form.is_valid():
-        form.save()
-        context = {}
-        # form.ProductBacklogForm()
-        return redirect('index')
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+            pbi.last_updated = datetime.now()
+            pbi.save()
+            return render(request, 'updateSuccess.html')
+    #     TODO: handle else condition since it is causing UI break
     context = {
         "form": form,
-        "title": "Edit PBI"
+        "label": "Edit PBI",
+        "url": request.get_full_path()
     }
-
     return render(request, "add_product_backlog_item.html", context)
 
 def DeletePBI(request, pk):

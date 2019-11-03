@@ -4,6 +4,7 @@ from datetime import datetime
 from django.urls import reverse
 # Create your models here.
 
+# TODO: Add priorityIncrease field, remove developer fields
 class ProductBacklog(models.Model):
     # product=models.ForeignKey(Product, on_delete=models.CASCADE) commented for now
     title=models.CharField(max_length=100)
@@ -16,7 +17,10 @@ class ProductBacklog(models.Model):
     sprint_no=models.PositiveSmallIntegerField(blank=True, null=True)
     main_dev=models.ForeignKey(User, on_delete=models.CASCADE, related_name="main_project_pbis")
     other_dev=models.ManyToManyField(User)
-    priority=models.IntegerField(blank=True, null=True)
+    priority=models.IntegerField()
+
+    def __str__(self):
+        return f"{self.id} {self.title}"
 
     def get_absolute_url(self):
 

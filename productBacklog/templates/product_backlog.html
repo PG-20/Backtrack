@@ -15,12 +15,12 @@
                     <th scope="col">Sprint</th>
                     <th scope="col">Priority</th>
                     <th scope="col">Status</th>
-                    <th scope="col">Action</th>
+                    <th scope="col">Actions</th>
                 </tr>
                 </thead>
                 <tbody>
                 {% for pbi in pbis %}
-                    <tr onclick="location.href = '{% url "edit-pbi" pbi.id %}'" id="row{{ pbi.id }}">
+                    <tr id="row{{ pbi.id }}">
                         <th scope="row">{{ pbi.id }}</th>
                         <td>{{ pbi.title }}</td>
                         <td>{{ pbi.last_updated }}</td>
@@ -28,27 +28,52 @@
                         <td>{{ pbi.sprint_no | default:'-' }}</td>
                         <td>{{ pbi.priority | default:'-' }}</td>
                         <td>{{ pbi.get_status_display }}</td>
-                        <td><button onclick="onDelete(event, {{ pbi.id }})" class="btn btn-danger">🗑️</button></td>
+                        <td>
+                            <button onclick="onDelete(event, {{ pbi.id }})" class="btn btn-danger">🗑️</button>
+                            <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-pbi' pbi.pk %}"
+                               class="btn btn-danger">✏️
+                            </button>
+                        </td>
                     </tr>
                 {% endfor %}
                 </tbody>
             </table>
         {% endif %}
-        <a href="{% url "add-pbi" %}">
-            <button>Add PBI</button>
-        </a>
+        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+            Add PBI
+        </button>
+{#    TODO: form failure possibly breaking because of code here #}
+        <div class="modal fade" id="modal">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+
+                </div>
+            </div>
+        </div>
     </div>
+
     <script>
-        function onDelete(e, id){
+        $('#modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var url = button.data('url');
+            var body = $('.modal-content');
+            $.ajax({
+                url: url,
+                context: document.body
+            }).done(function (response) {
+                body.html(response);
+            });
+        });
+
+        function onDelete(e, id) {
             e.stopPropagation();
             e.preventDefault();
 
             $.ajax({
-                url: "delete/"+id,
+                url: "delete/" + id,
                 success: function (del_id) {
-                    if (id==del_id) {
-                        $("#row"+id).remove();
-                        alert("Successfully deleted")
+                    if (id == del_id) {
+                        $("#row" + id).remove();
                     }
                 }
             });
