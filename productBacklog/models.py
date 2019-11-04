@@ -4,20 +4,17 @@ from datetime import datetime
 from django.urls import reverse
 # Create your models here.
 
-# TODO: Add priorityIncrease field, remove developer fields
 class ProductBacklog(models.Model):
     # product=models.ForeignKey(Product, on_delete=models.CASCADE) commented for now
     title=models.CharField(max_length=100)
     effort=models.IntegerField()
     story_points=models.IntegerField()
+    priority = models.IntegerField()
     effort_done=models.IntegerField(default=0)
-    status=models.CharField(max_length=2,choices=[('TD','To-Do'),('P','In Progress'),('D','Done')],default='TD')
+    status=models.CharField(max_length=2,choices=[('TD','To-Do'),('P','In Progress'),('D','Done'),('NF', 'Not Finished')],default='TD')
     last_updated=models.DateTimeField(auto_now=False,auto_now_add=False,default=datetime.now())
     pbi_type=models.CharField(max_length=2,choices=[('B','Bug'),('E','Epic'),('US','User Story')],default='US')
     sprint_no=models.PositiveSmallIntegerField(blank=True, null=True)
-    main_dev=models.ForeignKey(User, on_delete=models.CASCADE, related_name="main_project_pbis")
-    other_dev=models.ManyToManyField(User)
-    priority=models.IntegerField()
 
     def __str__(self):
         return f"{self.id} {self.title}"

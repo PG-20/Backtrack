@@ -1,22 +1,21 @@
-
-
 {% extends "base.html" %}
 
 {% block content %}
-    <div>
+    <div class="table-responsive">
         {% if pbis %}
             <table class="table table-hover">
                 <thead>
-                <tr>
-                    <th scope="col">#</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Last Updated</th>
-                    <th scope="col">Story Points</th>
-                    <th scope="col">Sprint</th>
-                    <th scope="col">Priority</th>
-                    <th scope="col">Status</th>
-                    <th scope="col">Actions</th>
-                </tr>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Last Updated</th>
+                        <th scope="col">Story Points</th>
+                        <th scope="col">Cumulative Story Points</th>
+                        <th scope="col">Sprint</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
                 </thead>
                 <tbody>
                 {% for pbi in pbis %}
@@ -25,14 +24,18 @@
                         <td>{{ pbi.title }}</td>
                         <td>{{ pbi.last_updated }}</td>
                         <td>{{ pbi.story_points }}</td>
+                        <td>{{ pbi.cumsp }}</td>
                         <td>{{ pbi.sprint_no | default:'-' }}</td>
                         <td>{{ pbi.priority | default:'-' }}</td>
                         <td>{{ pbi.get_status_display }}</td>
                         <td>
-                            <button onclick="onDelete(event, {{ pbi.id }})" class="btn btn-danger">🗑️</button>
-                            <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-pbi' pbi.pk %}"
-                               class="btn btn-danger">✏️
-                            </button>
+                            {% if pbi.status == 'TD' %}
+                                <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
+                                <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-pbi' pbi.pk %}"
+                                   class="btn">✏
+                                </button>
+                            {% endif %}
+                            <button class="btn">👁</button>
                         </td>
                     </tr>
                 {% endfor %}
@@ -42,33 +45,23 @@
         <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
             Add PBI
         </button>
-{#    TODO: form failure possibly breaking because of code here #}
-        <div class="modal fade" id="modal">
-            <div class="modal-dialog modal-lg" role="document">
-                <div class="modal-content">
-
-                </div>
-            </div>
-        </div>
+        <div class="modal fade" id="modal"></div>
     </div>
 
     <script>
         $('#modal').on('show.bs.modal', function (event) {
             var button = $(event.relatedTarget);
             var url = button.data('url');
-            var body = $('.modal-content');
+            var modal = $(this);
             $.ajax({
                 url: url,
                 context: document.body
             }).done(function (response) {
-                body.html(response);
+                modal.html(response);
             });
         });
 
         function onDelete(e, id) {
-            e.stopPropagation();
-            e.preventDefault();
-
             $.ajax({
                 url: "delete/" + id,
                 success: function (del_id) {

@@ -8,14 +8,10 @@ class ProductBacklogForm(forms.ModelForm):
         model=ProductBacklog
         fields=[
             'title',
-            'effort',
             'story_points',
-            'effort_done',
-            'status',
             'pbi_type',
-            'main_dev',
-            'other_dev',
-            'priority'
+            'sprint_no',
+            'priority',
         ]
 
     def clean_priority(self):

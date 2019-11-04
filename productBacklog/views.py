@@ -15,21 +15,13 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    pbis = ProductBacklog.objects.all().order_by('priority', '-last_updated')
-    skip=False
-    for i in range(len(pbis)):
-        if skip:
-            skip=False
-            continue
-        if i+1 < len(pbis) and pbis[i].priority == pbis[i+1].priority:
-            pbis[i+1].priority = i+1
-            pbis[i+1].save()
-            skip=True
-            continue
-        print(i)
-        pbis[i].priority = i+1
-        pbis[i].save()
-    context = {'title': "Product Backlog", 'pbis': pbis.order_by('priority')}
+    pbis = ProductBacklog.objects.all().order_by('priority')
+    cumsp =0
+    for pbi in pbis:
+        cumsp = cumsp + pbi.story_points
+        pbi.cumsp = cumsp
+
+    context = {'title': "Product Backlog", 'pbis': pbis}
     return render(request, 'product_backlog.html', context)
 
 
@@ -50,14 +42,31 @@ class AddPBIView(CreateView):
 
 def EditPBIView(request, *args, **kwargs):
     pbi=ProductBacklog.objects.get(pk=kwargs['pk'])
+    prevPriority = pbi.priority
     form = ProductBacklogForm(request.POST or None, instance=pbi)
     if request.method == "POST":
         if form.is_valid():
             form.save()
             pbi.last_updated = datetime.now()
             pbi.save()
+
+            pbis = ProductBacklog.objects.all().order_by('priority', '-last_updated')
+            skip = False
+            for i in range(len(pbis)):
+                if skip:
+                    skip = False
+                    continue
+                if i + 1 < len(pbis) and pbis[i].priority == pbis[i + 1].priority:
+                    if prevPriority < pbi.priority:
+                        pbis[i + 1].priority = i + 1
+                        pbis[i + 1].save()
+                        skip = True
+                        continue
+                    else:
+                        pass
+                pbis[i].priority = i + 1
+                pbis[i].save()
             return render(request, 'updateSuccess.html')
-    #     TODO: handle else condition since it is causing UI break
     context = {
         "form": form,
         "label": "Edit PBI",
