@@ -1,143 +1,144 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <nav class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
-        <a class="nav-link nav-item active" id="nav-full-view-tab" data-toggle="tab" href="#nav-full-view" role="tab"
-           aria-controls="nav-full-view" aria-selected="true">Full View</a>
-        <a class="nav-link nav-item" id="nav-current-view-tab" data-toggle="tab" href="#nav-current-view" role="tab"
-           aria-controls="nav-current-view" aria-selected="false">Current View</a>
-    </nav>
-    <br/>
-    <div class="tab-content" id="nav-tabContent">
-        <div class="tab-pane fade show active" id="nav-full-view" role="tabpanel" aria-labelledby="nav-full-view-tab">
-            <div class="table-responsive">
-                {% if pbis %}
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Last Updated</th>
-                            <th scope="col">Story Points</th>
-                            <th scope="col">Cumulative SP</th>
-                            <th scope="col">Sprint</th>
-                            <th scope="col">Priority</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for pbi in pbis %}
-                            <tr id="row{{ pbi.id }}">
-                                <th scope="row">{{ pbi.id }}</th>
-                                <td>{{ pbi.title }}</td>
-                                <td>{{ pbi.last_updated }}</td>
-                                <td>{{ pbi.story_points }}</td>
-                                <td>{{ pbi.cumsp }}</td>
-                                <td>{{ pbi.sprint_no | default:'-' }}</td>
-                                <td>{{ pbi.priority }}</td>
-                                <td>{{ pbi.get_status_display }}</td>
-                                <td>
-                                    {% if pbi.status == 'TD' %}
-                                        <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
-                                        <button data-toggle="modal" data-target="#modal"
-                                                data-url="{% url 'edit-pbi' pbi.pk %}"
-                                                class="btn">✏
-                                        </button>
-                                    {% endif %}
-                                    <button class="btn" data-toggle="modal" data-target="#modal"
-                                            data-url="{% url 'view-pbi' pbi.pk %}">👁
-                                    </button>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-                <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
-                    Add PBI
-                </button>
-                <div class="modal" id="modal" tabindex="-1"></div>
-            </div>
-        </div>
-        <div class="tab-pane fade show active" id="nav-current-view" role="tabpanel" aria-labelledby="nav-current-view-tab">
-            <div class="table-responsive">
-                {% if pbis %}
-                    <table class="table table-hover">
-                        <thead>
-                        <tr>
-                            <th scope="col">#</th>
-                            <th scope="col">Title</th>
-                            <th scope="col">Last Updated</th>
-                            <th scope="col">Story Points</th>
-                            <th scope="col">Cumulative SP</th>
-                            <th scope="col">Sprint</th>
-                            <th scope="col">Priority</th>
-                            <th scope="col">Status</th>
-                            <th scope="col">Actions</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {% for pbi in pbis %}
-                            {% if pbi.status != 'D' %}
-                            <tr id="row{{ pbi.id }}">
-                                <th scope="row">{{ pbi.id }}</th>
-                                <td>{{ pbi.title }}</td>
-                                <td>{{ pbi.last_updated }}</td>
-                                <td>{{ pbi.story_points }}</td>
-                                <td>{{ pbi.cumsp }}</td>
-                                <td>{{ pbi.sprint_no | default:'-' }}</td>
-                                <td>{{ pbi.priority }}</td>
-                                <td>{{ pbi.get_status_display }}</td>
-                                <td>
-                                    {% if pbi.status == 'TD' %}
-                                        <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
-                                        <button data-toggle="modal" data-target="#modal"
-                                                data-url="{% url 'edit-pbi' pbi.pk %}"
-                                                class="btn">✏
-                                        </button>
-                                    {% endif %}
-                                    <button class="btn" data-toggle="modal" data-target="#modal"
-                                            data-url="{% url 'view-pbi' pbi.pk %}">👁
-                                    </button>
-                                </td>
-                            </tr>
+<nav class="nav nav-tabs nav-fill" id="nav-tab" role="tablist">
+    <a class="nav-link nav-item active" id="nav-full-view-tab" data-toggle="tab" href="#nav-full-view" role="tab"
+        aria-controls="nav-full-view" aria-selected="true">Full View</a>
+    <a class="nav-link nav-item" id="nav-current-view-tab" data-toggle="tab" href="#nav-current-view" role="tab"
+        aria-controls="nav-current-view" aria-selected="false">Current View</a>
+</nav>
+<br />
+<div class="tab-content" id="nav-tabContent">
+    <div class="tab-pane fade show active" id="nav-full-view" role="tabpanel" aria-labelledby="nav-full-view-tab">
+        <div class="table-responsive">
+            {% if pbis %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Last Updated</th>
+                        <th scope="col">Story Points</th>
+                        <th scope="col">Cumulative SP</th>
+                        <th scope="col">Sprint</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pbi in pbis %}
+                    <tr id="row{{ pbi.id }}">
+                        <th scope="row">{{ pbi.id }}</th>
+                        <td>{{ pbi.title }}</td>
+                        <td>{{ pbi.last_updated }}</td>
+                        <td>{{ pbi.story_points }}</td>
+                        <td>{{ pbi.cumsp }}</td>
+                        <td>{{ pbi.sprint_no | default:'-' }}</td>
+                        <td>{{ pbi.priority }}</td>
+                        <td>{{ pbi.get_status_display }}</td>
+                        <td>
+                            {% if pbi.status == 'TD' %}
+                            <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
+                            <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-pbi' pbi.pk %}"
+                                class="btn">✏
+                            </button>
                             {% endif %}
-                            <button class="btn">👁</button>
+                            <button class="btn" data-toggle="modal" data-target="#modal"
+                                data-url="{% url 'view-pbi' pbi.pk %}">👁
+                            </button>
                         </td>
                     </tr>
-                {% endfor %}
+                    {% endfor %}
                 </tbody>
             </table>
-        {% endif %}
-        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
-            Add PBI
-        </button>
-        <div class="modal " id="modal"></div>
+            {% endif %}
+            <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+                Add PBI
+            </button>
+            <div class="modal" id="modal" tabindex="-1"></div>
+        </div>
     </div>
+    <div class="tab-pane fade show active" id="nav-current-view" role="tabpanel" aria-labelledby="nav-current-view-tab">
+        <div class="table-responsive">
+            {% if pbis %}
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Last Updated</th>
+                        <th scope="col">Story Points</th>
+                        <th scope="col">Cumulative SP</th>
+                        <th scope="col">Sprint</th>
+                        <th scope="col">Priority</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for pbi in pbis %}
+                    {% if pbi.status != 'D' %}
+                    <tr id="row{{ pbi.id }}">
+                        <th scope="row">{{ pbi.id }}</th>
+                        <td>{{ pbi.title }}</td>
+                        <td>{{ pbi.last_updated }}</td>
+                        <td>{{ pbi.story_points }}</td>
+                        <td>{{ pbi.cumsp }}</td>
+                        <td>{{ pbi.sprint_no | default:'-' }}</td>
+                        <td>{{ pbi.priority }}</td>
+                        <td>{{ pbi.get_status_display }}</td>
+                        <td>
+                            {% if pbi.status == 'TD' %}
+                            <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
+                            <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-pbi' pbi.pk %}"
+                                class="btn">✏
+                            </button>
+                            {% endif %}
+                            <button class="btn" data-toggle="modal" data-target="#modal"
+                                data-url="{% url 'view-pbi' pbi.pk %}">👁
+                            </button>
+                        </td>
+                    </tr>
+                    {% endif %}
+                    <!-- <button class="btn">👁</button>
+                    </td>
+                    </tr> -->
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% endif %}
+            <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+                Add PBI
+            </button>
+            <div class="modal " id="modal"></div>
+        </div>
+    </div>
+</div>
 
-    <script>
-        $('#modal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var url = button.data('url');
-            var modal = $(this);
-            $.ajax({
-                url: url,
-                context: document.body
-            }).done(function (response) {
-                modal.html(response);
-            });
+
+<script>
+    $('#modal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var url = button.data('url');
+        var modal = $(this);
+        $.ajax({
+            url: url,
+            context: document.body
+        }).done(function (response) {
+            modal.html(response);
         });
+    });
 
-        function onDelete(e, id) {
-            $.ajax({
-                url: "delete/" + id,
-                success: function (del_id) {
-                    if (id == del_id) {
-                        $("#row" + id).remove();
-                    }
+    function onDelete(e, id) {
+        $.ajax({
+            url: "delete/" + id,
+            success: function (del_id) {
+                if (id == del_id) {
+                    $("#row" + id).remove();
                 }
-            });
-        }
-    </script>
+            }
+        });
+    }
+</script>
 {% endblock %}
