@@ -103,16 +103,17 @@
                                 </td>
                             </tr>
                             {% endif %}
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                {% endif %}
-                <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
-                    Add PBI
-                </button>
-                <div class="modal" id="modal" tabindex="-1"></div>
-            </div>
-        </div>
+                            <button class="btn">👁</button>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% endif %}
+        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+            Add PBI
+        </button>
+        <div class="modal " id="modal"></div>
     </div>
 
     <script>

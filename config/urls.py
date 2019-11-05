@@ -16,9 +16,11 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from productBacklog.views import index
+from task.views import index
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
-    path('product_backlog/', include('productBacklog.urls'))
+    path('product_backlog/', include('productBacklog.urls')),
+    path('sprint_backlog/',include('task.urls'))
 ]

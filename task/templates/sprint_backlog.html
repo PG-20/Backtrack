@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+
+<div>
+    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' %}" class="btn btn-danger">
+        Add TASK
+    </button>
+    <div class="modal " id="modal"></div>
+</div>
+<script>
+    $('#modal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var url = button.data('url');
+        var modal = $(this);
+        $.ajax({
+            url: url,
+            context: document.body
+        }).done(function (response) {
+            modal.html(response);
+        });
+    });
+
+    // function onDelete(e, id) {
+    //     $.ajax({
+    //         url: "delete/" + id,
+    //         success: function (del_id) {
+    //             if (id == del_id) {
+    //                 $("#row" + id).remove();
+    //             }
+    //         }
+    //     });
+    // }
+</script>
+{% endblock %}
