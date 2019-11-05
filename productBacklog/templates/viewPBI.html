@@ -1,51 +1,44 @@
-<div class="modal-header">
-    <h4 class="modal-title"></h4>
-    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-        <span aria-hidden="true">&times;</span>
-    </button>
-</div>
-<div class="modal-body">
-    <div class="col">
-        <div class="row">
-            <div class="col-5">
-                {{ form.title | as_crispy_field }}
-            </div>
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">#{{ pbi.pk }}: {{ pbi.title }}</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
         </div>
-        <div class="row">
-            <div class="col-3">
-                {{ form.effort|as_crispy_field }}
-
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-4">
+                    <dt>Story Points</dt>
+                    <dd>{{ pbi.story_points }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Priority</dt>
+                    <dd>{{ pbi.priority }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Type</dt>
+                    <dd>{{ pbi.get_pbi_type_display }}</dd>
+                </div>
             </div>
-            <div class="col-3">
-                {{ form.effort_done|as_crispy_field }}
-
+            <div class="row">
+                <div class="col-4">
+                    <dt>Last Updated</dt>
+                    <dd>{{ pbi.last_updated }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Status</dt>
+                    <dd>{{ pbi.get_status_display }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Sprint No.</dt>
+                    <dd>{{ pbi.sprint_no | default:'-' }}</dd>
+                </div>
             </div>
-            <div class="col-3">
-                {{ form.story_points|as_crispy_field }}
-            </div>
+{#            TODO: add row from progress bar for effort hours and effort done#}
+        </div><!-- /.modal-body -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
         </div>
-        <div class="row">
-            <div class="col-3">
-                {{ form.status|as_crispy_field }}
-            </div>
-            <div class="col-3">
-                {{ form.pbi_type|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                {{ form.priority|as_crispy_field }}
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-3">
-                {{ form.main_dev|as_crispy_field }}
-                {{ form.other_dev|as_crispy_field }}
-            </div>
-        </div>
-    </div>
-</div>
-<div class="modal-footer">
-    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
-    <input type="submit" class="btn btn-primary" value="Save changes"/>
-</div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
