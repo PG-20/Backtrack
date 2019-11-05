@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-        <form action="{{ url }}" method="post" id="add-pbi" class="form">
+        <form action="{{ url }}" method="post" id="add-task" class="form">
             {% csrf_token %}
             <div class="modal-header">
                 <h4 class="modal-title">{{ label }}</h4>
@@ -45,6 +45,6 @@
         target: '#modal', success: function (response) {
         }
     };
-    $('#add-pbi').ajaxForm(form_options);
+    $('#add-task').ajaxForm(form_options);
 
 </script>

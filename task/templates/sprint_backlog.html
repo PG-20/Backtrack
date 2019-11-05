@@ -9,6 +9,13 @@
     </button>
     <div class="modal " id="modal"></div>
 </div>
+<br/>
+<div>
+    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
+        Add Sprint
+    </button>
+    <div class="modal " id="modal"></div>
+</div>
 <script>
     $('#modal').on('show.bs.modal', function (event) {
         var button = $(event.relatedTarget);

@@ -11,7 +11,7 @@ class Task(models.Model):
     description=models.CharField(max_length=1000)
 
 class Sprint(models.Model):
-    sprint_no=models.PositiveSmallIntegerField()
+    sprint_no=models.PositiveSmallIntegerField(default=0)
     current=models.BooleanField(default=True) 
     capacity=models.PositiveSmallIntegerField()
     total_effort=models.PositiveSmallIntegerField(default=0)
