@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView, CreateView
+from django.views.generic.detail import DetailView
 from django.http import HttpResponse
 from django.forms.models import model_to_dict
 from datetime import datetime
@@ -23,6 +24,11 @@ def ProductBacklogView(request):
 
     context = {'title': "Product Backlog", 'pbis': pbis}
     return render(request, 'product_backlog.html', context)
+
+class ViewPBIView(DetailView):
+    model = ProductBacklog
+    context_object_name = 'pbi'
+    template_name = 'viewPBI.html'
 
 
 class AddPBIView(CreateView):

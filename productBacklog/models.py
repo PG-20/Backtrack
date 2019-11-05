@@ -7,7 +7,7 @@ from django.urls import reverse
 class ProductBacklog(models.Model):
     # product=models.ForeignKey(Product, on_delete=models.CASCADE) commented for now
     title=models.CharField(max_length=100)
-    effort=models.IntegerField()
+    effort=models.IntegerField(default=0)
     story_points=models.IntegerField()
     priority = models.IntegerField()
     effort_done=models.IntegerField(default=0)
