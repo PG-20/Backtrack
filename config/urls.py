@@ -22,5 +22,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', index, name='index'),
     path('product_backlog/', include('productBacklog.urls')),
-    path('sprint_backlog/',include('task.urls'))
+    path('sprint_backlog/', include('sprintBacklog.urls'))
 ]

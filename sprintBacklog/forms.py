@@ -1,9 +1,7 @@
 from django import forms
 
-from .models import Task,Sprint
-
-
-
+from .models import Task
+from products.models import Sprint
  
 class AddTaskForm(forms.ModelForm):
     class Meta:
@@ -21,5 +19,4 @@ class AddSprintForm(forms.ModelForm):
         model=Sprint
         fields=[
             'capacity',
-            
         ]

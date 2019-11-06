@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import ProductBacklog
+from .models import ProductBacklogItem
 # Register your models here.
 
-admin.site.register(ProductBacklog)
+admin.site.register(ProductBacklogItem)
+

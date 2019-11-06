@@ -19,3 +19,12 @@ class Product(models.Model):
 
     def __str__(self):
         return self.name
+
+class Sprint(models.Model):
+    sprint_no = models.PositiveSmallIntegerField(default=0)
+    current = models.BooleanField(default=True)
+    capacity = models.PositiveSmallIntegerField()
+    total_effort = models.PositiveSmallIntegerField(default=0)
+
+    def __str__(self):
+        return f"Sprint {self.sprint_no}"
