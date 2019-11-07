@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    {% load static %}
     <title>BackTrack</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -87,13 +88,12 @@
 </style>
 <body style="height: 100%; width: 100%">
 <div id="mySidebar" class="sidebar">
-    {% load static %}
     <img src="{% static "images/logo_transparent.png" %}" alt="img"
          class="center"
          style="width: 250px">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="#">About</a>
-    <a href="#">Services</a>
+    <a href="{% url 'pb' %}">Product Backlog</a>
+    <a href="{% url 'sb' %}">Sprint Backlog</a>
     <a href="#">Clients</a>
     <a href="#">Contact</a>
 </div>

@@ -1,22 +1,25 @@
 from django import forms
 
-from .models import ProductBacklog
+from .models import ProductBacklogItem
+from products.models import Sprint
 
  
 class ProductBacklogForm(forms.ModelForm):
+    add_to_current_sprint = forms.BooleanField(disabled=not bool(len(Sprint.objects.all())), required=False)
+
     class Meta:
-        model=ProductBacklog
+        model=ProductBacklogItem
         fields=[
             'title',
             'story_points',
             'pbi_type',
-            'sprint_no',
             'priority',
+            'add_to_current_sprint'
         ]
 
     def clean_priority(self):
         data = self.cleaned_data['priority']
-        if data > len(ProductBacklog.objects.all())+1:
+        if data > len(ProductBacklogItem.objects.all())+1:
             raise forms.ValidationError("Priority exceeds number of PBIS")
         elif data < 1:
             raise forms.ValidationError("Priority cannot be less than 1")

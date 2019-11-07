@@ -1,7 +1,7 @@
 {% load crispy_forms_tags %}
 <div class="modal-dialog modal-lg" role="document">
     <div class="modal-content">
-        <form action="{{ url }}" method="post" id="add-pbi" class="form">
+        <form action="{{ url }}" method="post" id="add-task" class="form">
             {% csrf_token %}
             <div class="modal-header">
                 <h4 class="modal-title">{{ label }}</h4>
@@ -10,26 +10,20 @@
                 </button>
             </div>
             <div class="modal-body">
-                <div class="row">
-                    <div class="col-7">
-                        {{ form.title | as_crispy_field }}
-                    </div>
-                    <div class="col-5">
-                        {{ form.priority|as_crispy_field }}
-                    </div>
-                </div>
-                <div class="row d-flex align-items-center">
-                    <div class="col-4">
-                        {{ form.story_points|as_crispy_field }}
-                    </div>
-                    <div class="col-4">
-                        {{ form.pbi_type|as_crispy_field }}
-                    </div>
-                    {% if pbi and not pbi.sprint or not pbi %}
-                        <div class="col-4">
-                            {{ form.add_to_current_sprint|as_crispy_field }}
+                <div class="col">
+                    <div class="row">
+                        <div class="col-5">
+                            {{ form.owner | as_crispy_field }}
                         </div>
-                    {% endif %}
+                        <div class="col-2">
+                            {{ form.effort|as_crispy_field }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-7">
+                            {{ form.description|as_crispy_field }}
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="modal-footer">
@@ -44,6 +38,6 @@
         target: '#modal', success: function (response) {
         }
     };
-    $('#add-pbi').ajaxForm(form_options);
+    $('#add-task').ajaxForm(form_options);
 
 </script>

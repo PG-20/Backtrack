@@ -7,14 +7,14 @@
             </button>
         </div>
         <div class="modal-body">
-            <p class="alert alert-info">Product backlog was successfully updated!</p>
-        </div><!-- /.modal-body -->
-    </div><!-- /.modal-content -->
-</div><!-- /.modal-dialog -->
+            <p class="alert alert-info">{{ message }}</p>
+        </div>
+    </div>
+</div>
 <script>
-    // close the modal after 3 seconds
+    // close the modal after 1.5 seconds
     setTimeout(function () {
         $('#modal').modal('hide');
         window.location.reload()
-    }, 2000);
+    }, 1500);
 </script>
