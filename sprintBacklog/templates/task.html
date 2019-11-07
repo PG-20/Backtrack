@@ -5,7 +5,6 @@
             {% csrf_token %}
             <div class="modal-header">
                 <h4 class="modal-title">{{ label }}</h4>
-{#                TODO: modal doesn't close, idk how to fix #}
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -16,18 +15,12 @@
                         <div class="col-5">
                             {{ form.owner | as_crispy_field }}
                         </div>
-                        <div class="col-3">
+                        <div class="col-2">
                             {{ form.effort|as_crispy_field }}
                         </div>
                     </div>
                     <div class="row">
-                        <div class="col-3">
-                            {{ form.status|as_crispy_field }}
-                        </div>
-                        <div class="col-3">
-                            {{ form.pbi|as_crispy_field }}
-                        </div>
-                        <div class="col-3">
+                        <div class="col-7">
                             {{ form.description|as_crispy_field }}
                         </div>
                     </div>

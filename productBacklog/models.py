@@ -8,10 +8,10 @@ import django
 class ProductBacklogItem(models.Model):
     # product=models.ForeignKey(Product, on_delete=models.CASCADE) commented for now
     title=models.CharField(max_length=100)
-    effort=models.IntegerField(blank=True, null=True)
+    effort=models.IntegerField(default=0)
     story_points=models.IntegerField()
     priority = models.IntegerField()
-    effort_done=models.IntegerField(blank=True, null=True)
+    effort_done=models.IntegerField(default=0)
     status=models.CharField(max_length=2,choices=[('TD','To-Do'),('P','In Progress'),('D','Done'),('NF', 'Not Finished')],default='TD')
     last_updated=models.DateTimeField(auto_now=False,auto_now_add=False,default=django.utils.timezone.now)
     pbi_type=models.CharField(max_length=2,choices=[('B','Bug'),('E','Epic'),('US','User Story')],default='US')

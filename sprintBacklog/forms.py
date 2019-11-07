@@ -7,11 +7,9 @@ class AddTaskForm(forms.ModelForm):
     class Meta:
         model=Task
         fields=[
+            'description',
             'owner',
             'effort',
-            'status',
-            'pbi',
-            'description',
         ]
  
 class AddSprintForm(forms.ModelForm):

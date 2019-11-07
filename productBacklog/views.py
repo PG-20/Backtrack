@@ -17,7 +17,6 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    print(Sprint.objects.get(current=True).productbacklogitem_set.count())
     pbis = ProductBacklogItem.objects.all().order_by('priority', '-last_updated')
     cumsp = 0
     for i in range(len(pbis)):
@@ -47,7 +46,7 @@ class AddPBIView(CreateView):
 
     def form_valid(self, form):
         form.save()
-        return render(self.  request, 'updateSuccess.html')
+        return render(self.request, 'updateSuccess.html', {'message': "PBI added successfully"})
 
 
 def EditPBIView(request, *args, **kwargs):
@@ -81,7 +80,7 @@ def EditPBIView(request, *args, **kwargs):
                         pass
                 pbis[i].priority = i + 1
                 pbis[i].save()
-            return render(request, 'updateSuccess.html')
+            return render(request, 'updateSuccess.html', {'message': "PBI updated successfully"})
     context = {
         "form": form,
         "label": "Edit PBI",

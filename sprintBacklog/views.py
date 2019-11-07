@@ -1,11 +1,20 @@
 from django.shortcuts import render
 from django.views.generic.edit import UpdateView, CreateView
-
-from .forms import AddTaskForm,AddSprintForm
-# from .forms import ProductBacklogForm
+from products.models import Sprint
+from productBacklog.models import ProductBacklogItem
+from .forms import AddTaskForm, AddSprintForm
+from datetime import datetime
+from django.db.models import Sum
 
 def SprintBacklogView(request):
-    return render(request, 'sprint_backlog.html')
+    sprints = Sprint.objects.get(current=True)
+    print(sprints.productbacklogitem_set.all().aggregate(Sum('effort')))
+    left = sprints.capacity - sprints.productbacklogitem_set.all().aggregate(Sum('effort'))['effort__sum']
+    context = {
+        "sprint": sprints,
+        "capacity_left": left
+    }
+    return render(request, 'sprint_backlog.html', context)
 
 
 class AddTask(CreateView):
@@ -19,8 +28,14 @@ class AddTask(CreateView):
         return context
 
     def form_valid(self, form):
-        form.save()
-        return render(self.request, 'updateSuccess.html')
+        self.object = form.save(commit=False)
+        pbi = ProductBacklogItem.objects.get(pk=self.kwargs['pk'])
+        pbi.effort += self.object.effort
+        pbi.last_updated = datetime.now()
+        pbi.save()
+        self.object.pbi = pbi
+        self.object.save()
+        return render(self.request, 'updateSuccess.html', {'message': "Task was successfully added"})
 
 
 class AddSprint(CreateView):
@@ -32,9 +47,8 @@ class AddSprint(CreateView):
         context = super().get_context_data(**kwargs)
         context['label'] = "Add Sprint"
         context['url'] = self.request.get_full_path()
-        print("inside ADD SPRINR")
         return context
 
     def form_valid(self, form):
         form.save()
-        return render(self.request, 'updateSuccessSprint.html')
+        return render(self.request, 'updateSuccess.html', {'message': "Sprint was added successfully"})
