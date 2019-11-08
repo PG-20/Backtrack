@@ -1,57 +1,73 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <div>
-        <div class="page-header">
-            <h1>Sprint {{ sprint.sprint_no }}
-                <small class="text-muted">Capacity left: {{ capacity_left }}</small>
-            </h1>
+<div>
+    <div class="page-header">
+        <h1>Sprint {{ sprint.sprint_no }}
+            <small class="text-muted">Capacity left: {{ capacity_left }}</small>
+        </h1>
+    </div>
+    {% for pbi in sprint.productbacklogitem_set.all %}
+    <div class="card">
+        <div class="card-header d-flex justify-content-between">
+            <span><b>PBI #{{ pbi.id }}</b> &emsp; {{ pbi.title }}</span>
+            <span>Story Points: {{ pbi.story_points }}</span>
+            <span>Priority: {{ pbi.priority }}</span>
         </div>
-        {% for pbi in sprint.productbacklogitem_set.all %}
-            <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <span><b>PBI #{{ pbi.id }}</b> &emsp; {{ pbi.title }}</span>
-                    <span>Story Points: {{ pbi.story_points }}</span>
-                    <span>Priority: {{ pbi.priority }}</span>
-                </div>
-                <div class="card-body row overflow-auto">
-                    {% for task in pbi.task_set.all %}
-                        <div class="card" style="width: 250px; margin: 5px 5px">
-                            <div class="card-body">
-                                <h5 class="card-title"> #{{ task.id }}</h5>
-                                <p class="card-text"> {{ task.description }} </p>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="card-footer">
-                    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' pbi.pk %}"
-                            class="btn btn-danger">
-                        Add TASK
+        <div class="card-body row overflow-auto">
+            {% for task in pbi.task_set.all %}
+            <div id="card{{task.id}}"class="card" style="width: 250px; margin: 5px 5px">
+                <div class="card-body">
+                    <h5 class="card-title"> #{{ task.id }}</h5>
+                    <p class="card-text"> {{ task.description }} </p>
+                    <button class="btn" data-toggle="modal" data-target="#modal"
+                        data-url="{% url 'view-task' task.pk %}">👁
                     </button>
+                    <button data-toggle="modal" data-target="#modal" data-url="{% url 'edit-task' task.pk %}"
+                        class="btn">✏
+                    </button>
+                    <button onclick="onDelete(event, {{ task.pk }})" class="btn">🗑</button>
                 </div>
             </div>
-        {% endfor %}
+            {% endfor %}
+        </div>
+        <div class="card-footer">
+            <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' pbi.pk %}"
+                class="btn btn-danger">
+                Add TASK
+            </button>
+        </div>
     </div>
-    <br/>
-    <div>
-        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
-            Add Sprint
-        </button>
-    </div>
-    <div class="modal" id="modal"></div>
-    <script>
-        $('#modal').on('show.bs.modal', function (event) {
-            var button = $(event.relatedTarget);
-            var url = button.data('url');
-            var modal = $(this);
-            $.ajax({
-                url: url,
-                context: document.body
-            }).done(function (response) {
-                modal.html(response);
-            });
+    {% endfor %}
+</div>
+<br />
+<div>
+    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
+        Add Sprint
+    </button>
+</div>
+<div class="modal" id="modal"></div>
+<script>
+    $('#modal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget);
+        var url = button.data('url');
+        var modal = $(this);
+        $.ajax({
+            url: url,
+            context: document.body
+        }).done(function (response) {
+            modal.html(response);
         });
-
-    </script>
+    });
+    function onDelete(e, id) {
+            $.ajax({
+                url: "delete/" + id,
+                success: function (del_id) {
+                    if (id == del_id) {
+                        $("#card" + id).remove();
+                    }
+                }
+            });
+        }
+</script>
 {% endblock %}

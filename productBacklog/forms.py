@@ -5,7 +5,7 @@ from products.models import Sprint
 
  
 class ProductBacklogForm(forms.ModelForm):
-    add_to_current_sprint = forms.BooleanField(disabled=not bool(len(Sprint.objects.all())), required=False)
+    add_to_current_sprint = forms.BooleanField(disabled= not bool(Sprint.objects.count()), required=False)
 
     class Meta:
         model=ProductBacklogItem

@@ -1,10 +1,13 @@
 from django.shortcuts import render
 from django.views.generic.edit import UpdateView, CreateView
 from products.models import Sprint
+from django.views.generic.detail import DetailView
 from productBacklog.models import ProductBacklogItem
 from .forms import AddTaskForm, AddSprintForm
 from datetime import datetime
 from django.db.models import Sum
+from .models import Task
+from django.http import HttpResponse
 
 def SprintBacklogView(request):
     sprints = Sprint.objects.get(current=True)
@@ -52,3 +55,35 @@ class AddSprint(CreateView):
     def form_valid(self, form):
         form.save()
         return render(self.request, 'updateSuccess.html', {'message': "Sprint was added successfully"})
+
+
+class ViewTask(DetailView):
+    model=Task
+    context_object_name = 'task'
+    template_name = 'viewTask.html'
+
+def EditTask(request, *args, **kwargs):
+    task=Task.objects.get(pk=kwargs['pk'])
+    # prevPriority = task.priority
+    form = AddTaskForm(request.POST or None, instance=task)
+    if request.method == "POST":
+        if form.is_valid():
+            form.save()
+
+            task.last_updated = datetime.now()
+            task.save()
+
+           
+            return render(request, 'updateSuccess.html', {'message': "Task updated successfully"})
+    context = {
+        "form": form,
+        "label": "Edit Task",
+        "url": request.get_full_path(),
+        "task": task
+    }
+    return render(request, "task.html", context)
+
+
+def DeleteTask(request, pk):
+    Task.objects.get(pk=pk).delete()
+    return HttpResponse(pk)

@@ -1,0 +1,44 @@
+<div class="modal-dialog modal-lg" role="document">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">ID: {{ task.id}}</h4>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+        <div class="modal-body">
+            <div class="row">
+                <div class="col-4">
+                    <dt>Owner</dt>
+                    <dd>{{ task.owner }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Effort</dt>
+                    <dd>{{ task.effort }}</dd>
+                </div>
+                <div class="col-4">
+                    <dt>Status</dt>
+                    <dd>{{ task.status }}</dd>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-4">
+                    <dt>Description</dt>
+                    <dd>{{ task.description}}</dd>
+                </div>
+                <!-- <div class="col-4">
+                    <dt>Status</dt>
+                    <dd>{{ pbi.get_status_display }}</dd>
+                </div> -->
+                <!-- <div class="col-4">
+                    <dt>Sprint No.</dt>
+                    <dd>{{ pbi.sprint.sprint_no | default:'-' }}</dd>
+                </div> -->
+            </div>
+{#            TODO: add row from progress bar for effort hours and effort done#}
+        </div><!-- /.modal-body -->
+        <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+        </div>
+    </div><!-- /.modal-content -->
+</div><!-- /.modal-dialog -->
