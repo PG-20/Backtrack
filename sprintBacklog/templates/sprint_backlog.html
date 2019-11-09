@@ -1,57 +1,108 @@
 {% extends "base.html" %}
-
+{% load mathfilters %}
 {% block content %}
-    <div>
-        <div class="page-header">
-            <h1>Sprint {{ sprint.sprint_no }}
-                <small class="text-muted">Capacity left: {{ capacity_left }}</small>
-            </h1>
-        </div>
-        {% for pbi in sprint.productbacklogitem_set.all %}
-            <div class="card">
-                <div class="card-header d-flex justify-content-between">
-                    <span><b>PBI #{{ pbi.id }}</b> &emsp; {{ pbi.title }}</span>
-                    <span>Story Points: {{ pbi.story_points }}</span>
-                    <span>Priority: {{ pbi.priority }}</span>
+    {% if sprint %}
+        <div>
+            <div class="page-header" style="margin-bottom: 10px">
+                <div class="d-flex justify-content-between">
+                    <h2>Sprint {{ sprint.sprint_no }}
+                        <small class="text-muted">Capacity
+                            left: {{ capacity_left }}hr{{ capacity_left|pluralize }}</small>
+                    </h2>
+                    <h5 class="text-muted">{{ sprint.get_status_display }}&emsp;Time left: {{ time_left }}</h5>
                 </div>
-                <div class="card-body row overflow-auto">
-                    {% for task in pbi.task_set.all %}
-                        <div id="card{{ task.id }}" class="card" style="width: 250px; margin: 5px 5px">
-                            <div class="card-body">
-                                <div class="bg-primary float-right d-flex align-items-center justify-content-center"
-                                     data-toggle="tooltip" data-placement="top" title="{{ task.owner }}"
-                                     style="height: 45px; width: 45px; border-radius: 50%; ">
-                                    <span class="text-white" style="font-size: 25px; font-weight: 100">{{ task.owner | capfirst | make_list | first }}</span>
-                                </div>
-                                <h5 class="card-title"> #{{ task.id }}</h5>
-                                <p class="card-text"> {{ task.description }} </p>
-                                <button class="btn" data-toggle="modal" data-target="#modal"
-                                        data-url="{% url 'view-task' task.pk %}">👁
-                                </button>
-                                <button data-toggle="modal" data-target="#modal"
-                                        data-url="{% url 'edit-task' task.pk %}"
-                                        class="btn">✏
-                                </button>
-                                <button onclick="onDelete(event, {{ task.pk }})" class="btn">🗑</button>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-                <div class="card-footer">
-                    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' pbi.pk %}"
-                            class="btn btn-danger">
-                        Add TASK
-                    </button>
+                {% if capacity_left < 0 %}
+                    <h5 class="text-danger">Capacity exceeded: remove some PBIs</h5>
+                {% endif %}
+                <div class="progress">
+                    <div class="progress-bar" role="progressbar" style="width: {{ burndown }}%; font-size: 10px"
+                         aria-valuenow="{{ burndown }}" aria-valuemin="0"
+                         aria-valuemax="100">Sprint {{ burndown }}% completed
+                    </div>
                 </div>
             </div>
-        {% endfor %}
-    </div>
+            <div class="accordion">
+                {% for pbi in pbis %}
+                    <div class="card">
+                        <div class="card-header collapsed" data-toggle="collapse" data-target="#collapse{{ pbi.id }}"
+                             aria-expanded="false" role="button"
+                             id="heading{{ pbi.id }}" style="cursor: pointer;"
+                             aria-controls="collapse{{ pbi.id }}">
+                            <div class="d-flex justify-content-between">
+                                <span><b class="h6">PBI #{{ pbi.id }}</b> &emsp; {{ pbi.title }}</span>
+                                <div class="d-flex justify-content-between w-50">
+                                    <span>Story Points: <b>{{ pbi.story_points }}</b></span>
+                                    <span>Priority: <b>{{ pbi.priority }}</b></span>
+                                </div>
+                            </div>
+                            <div class="d-flex justify-content-between">
+                                <span>Total Effort: <b>{{ pbi.effort }}</b></span>
+                                <div class="d-flex justify-content-between w-50">
+                                <span>Hours remaining: <b
+                                        class="text-danger">{{ pbi.effort|sub:pbi.effort_done }}</b></span>
+                                    <span>Hours Done: <b class="text-success">{{ pbi.effort_done }}</b></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="collapse{{ pbi.id }}" class="collapse" aria-labelledby="heading{{ pbi.id }}">
+                            <div class="card-body row nowrap overflow-auto">
+                                {% for task in pbi.task_set.all %}
+                                    <div id="card{{ task.id }}" class="card" style="width: 270px; margin: 5px 5px">
+                                        <div class="card-header d-flex bg-transparent justify-content-between align-items-center">
+                                            <b>{{ task.effort }}hr{{ task.effort|pluralize }}</b>
+                                            <b> {{ task.get_status_display }} </b>
+                                        </div>
+                                        <div class="card-body">
+                                            <div class="d-flex justify-content-between">
+                                                <h5 class="card-title"> #{{ task.id }}</h5>
+                                                <div class="d-flex align-items-center justify-content-center"
+                                                     data-toggle="tooltip" data-placement="top" title="{{ task.owner }}"
+                                                     style="height: 45px;background-color: #FFC40E; width: 45px; border-radius: 50%; cursor: default">
+                                                 <span class="text-white"
+                                                       style="font-size: 25px; font-weight: 100">{{ task.owner | capfirst | make_list | first }}</span>
+                                                </div>
+                                            </div>
+                                            <p class="card-text"> {{ task.description }} </p>
+
+                                        </div>
+                                        <div class="card-footer d-flex bg-transparent justify-content-between align-items-center">
+                                            <button data-toggle="modal" data-target="#modal"
+                                                    data-url="{% url 'edit-task' task.pk %}"
+                                                    class="btn"
+                                                    style="font-size: 15px"
+                                            >✏
+                                            </button>
+                                            <button onclick="onDeleteTask(event, {{ task.pk }})" class="btn"
+                                                    style="font-size: 15px">🗑
+                                            </button>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                            <div class="card-footer d-flex justify-content-between">
+                                <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' pbi.pk %}"
+                                        class="btn btn-danger">
+                                    Add Task
+                                </button>
+                                <button onclick="onRemovePBI(event, {{ pbi.pk }})" class="btn btn-danger">Remove PBI
+                                    from
+                                    Sprint
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
     <br/>
-    <div>
-        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
-            Add Sprint
-        </button>
-    </div>
+    {% if sprint and sprint.status != 'P' or not sprint %}
+        <div>
+            <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
+                Add Sprint
+            </button>
+        </div>
+    {% endif %}
     <div class="modal" id="modal"></div>
     <script>
         $('#modal').on('show.bs.modal', function (event) {
@@ -66,12 +117,23 @@
             });
         });
 
-        function onDelete(e, id) {
+        function onDeleteTask(e, id) {
             $.ajax({
                 url: "delete/" + id,
                 success: function (del_id) {
-                    if (id == del_id) {
-                        $("#card" + id).remove();
+                    window.location.reload()
+                }
+            });
+        }
+
+        function onRemovePBI(e, id) {
+            $.ajax({
+                url: "remove-pbi/" + id,
+                success: function (res) {
+                    if (res.success) {
+                        window.location.reload()
+                    } else {
+                        alert(res.error)
                     }
                 }
             });

@@ -40,7 +40,8 @@ INSTALLED_APPS = [
     'products',
     'productBacklog',
     'sprintBacklog',
-    'crispy_forms'
+    'crispy_forms',
+    'mathfilters',
 ]
 
 MIDDLEWARE = [

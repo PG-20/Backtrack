@@ -10,7 +10,13 @@ class AddTaskForm(forms.ModelForm):
             'description',
             'owner',
             'effort',
+            'status',
         ]
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['status'].required = False
+
  
 class AddSprintForm(forms.ModelForm):
     class Meta:
