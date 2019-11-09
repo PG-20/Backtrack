@@ -25,6 +25,9 @@ class Sprint(models.Model):
     current = models.BooleanField(default=True)
     capacity = models.PositiveSmallIntegerField()
     total_effort = models.PositiveSmallIntegerField(default=0)
+    status = models.CharField(max_length=2, choices=[('NS', 'Not Started'), ('P', 'In Progress'), ('D', 'Done')],
+                              default='NS')
+    end_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
         return f"Sprint {self.sprint_no}"

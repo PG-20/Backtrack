@@ -1,4 +1,4 @@
-<div class="modal-dialog modal-lg" role="document">
+<div class="modal-dialog modal-md" role="document">
     <div class="modal-content">
         <div class="modal-header">
             <h4 class="modal-title">#{{ pbi.pk }}: {{ pbi.title }}</h4>
@@ -35,7 +35,6 @@
                     <dd>{{ pbi.sprint.sprint_no | default:'-' }}</dd>
                 </div>
             </div>
-{#            TODO: add row from progress bar for effort hours and effort done#}
         </div><!-- /.modal-body -->
         <div class="modal-footer">
             <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>

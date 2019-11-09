@@ -8,8 +8,7 @@ verify_ssl = true
 [packages]
 django = "*"
 django-crispy-forms = "*"
-sqlite3 = "*"
-3-22-0 = "*"
+django-mathfilters = "*"
 
 [requires]
 python_version = "3.7"

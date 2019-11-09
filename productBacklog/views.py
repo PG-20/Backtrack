@@ -2,9 +2,9 @@ from django.shortcuts import render, redirect
 from django.views.generic.edit import UpdateView, CreateView
 from django.views.generic.detail import DetailView
 from django.http import HttpResponse
-from django.forms.models import model_to_dict
+from sprintBacklog.views import endSprint
 from products.models import Sprint
-from datetime import datetime
+from datetime import datetime, timedelta
 
 from .models import ProductBacklogItem
 from .forms import ProductBacklogForm
@@ -17,6 +17,7 @@ def index(request):
 
 
 def ProductBacklogView(request):
+    endSprint(Sprint.objects.get(current=True))
     pbis = ProductBacklogItem.objects.all().order_by('priority', '-last_updated')
     cumsp = 0
     for i in range(len(pbis)):
@@ -49,20 +50,27 @@ class AddPBIView(CreateView):
         return render(self.request, 'updateSuccess.html', {'message': "PBI added successfully"})
 
 
-def EditPBIView(request, *args, **kwargs):
-    pbi=ProductBacklogItem.objects.get(pk=kwargs['pk'])
+def EditPBIView(request, pk):
+    pbi=ProductBacklogItem.objects.get(pk=pk)
     prevPriority = pbi.priority
     form = ProductBacklogForm(request.POST or None, instance=pbi)
     if request.method == "POST":
         if form.is_valid():
-            form.save()
-
-            pbi.last_updated = datetime.now()
-            pbi.save()
+            pbi = form.save(commit=False)
 
             if form.cleaned_data['add_to_current_sprint']:
-                pbi.sprint = Sprint.objects.get(current=True)
-                pbi.save()
+                sprint = Sprint.objects.get(current=True)
+                if sprint.status == 'NS':
+                    sprint.status = 'P'
+                    sprint.end_date = datetime.now() + timedelta(days=15)
+                    sprint.save()
+                pbi.sprint = sprint
+                pbi.status = 'P'
+
+            if form.has_changed():
+                pbi.last_updated = datetime.now()
+
+            pbi.save()
 
             pbis = ProductBacklogItem.objects.all().order_by('priority', '-last_updated')
             skip = False
@@ -92,7 +100,3 @@ def EditPBIView(request, *args, **kwargs):
 def DeletePBI(request, pk):
     ProductBacklogItem.objects.get(pk=pk).delete()
     return HttpResponse(pk)
-
-
-
-
