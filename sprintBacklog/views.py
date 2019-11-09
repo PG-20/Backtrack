@@ -24,11 +24,14 @@ def endSprint(sprint):
     return False
 
 def SprintBacklogView(request):
-    sprints = Sprint.objects.get(current=True)
+    try:
+        sprints = Sprint.objects.get(current=True)
+    except Exception:
+        sprints = None
     context = {
         'title': 'Sprint Backlog'
     }
-    if not endSprint(sprints):
+    if not endSprint(sprints) and sprints:
         time_left = sprints.end_date - datetime.now()
         sumOfEfforts = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))[
             'effort__sum'] if sprints.productbacklogitem_set.count() else 0
@@ -68,6 +71,7 @@ class AddTask(CreateView):
         self.object = form.save(commit=False)
         pbi = ProductBacklogItem.objects.get(pk=self.kwargs['pk'])
         pbi.effort += self.object.effort
+        pbi.status = 'P'
         pbi.last_updated = datetime.now()
         pbi.save()
         self.object.pbi = pbi

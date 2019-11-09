@@ -50,7 +50,7 @@
                                 </td>
                                 <td>{{ pbi.story_points }}</td>
                                 <td>{{ pbi.cumsp }}</td>
-                                <td>{{ pbi.sprint.sprint_no | default:'-' }}</td>
+                                <td>{{ pbi.sprint.id | default:'-' }}</td>
                                 <td>{{ pbi.priority }}</td>
                                 <td>{{ pbi.get_status_display }}</td>
                                 <td>
@@ -117,7 +117,7 @@
                                     </td>
                                     <td>{{ pbi.story_points }}</td>
                                     <td>{{ pbi.cumsp }}</td>
-                                    <td>{{ pbi.sprint.sprint_no | default:'-' }}</td>
+                                    <td>{{ pbi.sprint.id | default:'-' }}</td>
                                     <td>{{ pbi.priority }}</td>
                                     <td>{{ pbi.get_status_display }}</td>
                                     <td>

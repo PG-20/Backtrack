@@ -17,7 +17,11 @@ def index(request):
 
 
 def ProductBacklogView(request):
-    endSprint(Sprint.objects.get(current=True))
+    try:
+        sprint = Sprint.objects.get(current=True)
+    except Exception:
+        sprint = None
+    endSprint(sprint)
     pbis = ProductBacklogItem.objects.all().order_by('priority', '-last_updated')
     cumsp = 0
     for i in range(len(pbis)):

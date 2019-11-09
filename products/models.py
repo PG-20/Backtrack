@@ -21,7 +21,6 @@ class Product(models.Model):
         return self.name
 
 class Sprint(models.Model):
-    sprint_no = models.PositiveSmallIntegerField(default=0)
     current = models.BooleanField(default=True)
     capacity = models.PositiveSmallIntegerField()
     total_effort = models.PositiveSmallIntegerField(default=0)
@@ -30,4 +29,4 @@ class Sprint(models.Model):
     end_date = models.DateTimeField(blank=True, null=True)
 
     def __str__(self):
-        return f"Sprint {self.sprint_no}"
+        return f"Sprint {self.id}"
