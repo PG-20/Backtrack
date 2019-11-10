@@ -6,18 +6,30 @@
             <div class="page-header" style="margin-bottom: 10px">
                 <div class="d-flex justify-content-between">
                     <h2>Sprint {{ sprint.id }}
-                        <small class="text-muted">Capacity
-                            left: {{ capacity_left }}hr{{ capacity_left|pluralize }}</small>
+                        <small class="text-muted">
+                            {% if time_left %}
+                                Capacity left: {{ capacity_left }}hr{{ capacity_left|pluralize }}
+                            {% else %}
+                                Add PBIs from Product Backlog to start sprint
+                            {% endif %}
+                        </small>
                     </h2>
-                    <h5 class="text-muted">{{ sprint.get_status_display }}&emsp;Time left: {{ time_left }}</h5>
+                    {% if time_left %}
+                        <h5 class="text-muted">Cumulative Story Points: {{ cum_sp }}&emsp;Time
+                            left: {{ time_left }}&emsp;{{ sprint.get_status_display }}</h5>
+                    {% endif %}
                 </div>
                 {% if capacity_left < 0 %}
                     <h5 class="text-danger">Capacity exceeded: remove some PBIs</h5>
                 {% endif %}
                 <div class="progress">
-                    <div class="progress-bar" role="progressbar" style="width: {{ burndown }}%; font-size: 10px"
+                    <div class="progress-bar transition" role="progressbar"
+                         style="width: 0; font-size: 10px; transition: 1s"
                          aria-valuenow="{{ burndown }}" aria-valuemin="0"
-                         aria-valuemax="100">Sprint {{ burndown }}% completed
+                         aria-valuemax="100">
+                        {% if time_left %}
+                            Sprint {{ burndown }}% completed
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -94,9 +106,8 @@
                 {% endfor %}
             </div>
         </div>
-    {% endif %}
-    <br/>
-    {% if sprint and sprint.status != 'P' or not sprint %}
+    {% else %}
+        <br/>
         <div>
             <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
                 Add Sprint
@@ -117,6 +128,10 @@
             });
         });
 
+        $(document).ready(function () {
+            $('.transition').css('width', "{{ burndown }}%")
+        });
+
         function onDeleteTask(e, id) {
             $.ajax({
                 url: "delete/" + id,
@@ -130,10 +145,11 @@
             $.ajax({
                 url: "remove-pbi/" + id,
                 success: function (res) {
-                    if (res.success) {
+                    console.log(res);
+                    if (res) {
                         window.location.reload()
                     } else {
-                        alert(res.error)
+                        alert(res['errorMessage'])
                     }
                 }
             });

@@ -23,14 +23,22 @@ def ProductBacklogView(request):
         sprint = None
     endSprint(sprint)
     pbis = ProductBacklogItem.objects.all().order_by('priority', '-last_updated')
+    pbis2 = pbis.exclude(status='D')
+
     cumsp = 0
     for i in range(len(pbis)):
         pbis[i].priority = i + 1
         pbis[i].save()
         cumsp = cumsp + pbis[i].story_points
         pbis[i].cumsp = cumsp
+    cumsp = 0
+    for i in range(len(pbis2)):
+        pbis2[i].priority = i + 1
+        pbis2[i].save()
+        cumsp = cumsp + pbis2[i].story_points
+        pbis2[i].cumsp = cumsp
 
-    context = {'title': "Product Backlog", 'pbis': pbis}
+    context = {'title': "Product Backlog", 'pbiList': [pbis, pbis2]}
     return render(request, 'product_backlog.html', context)
 
 class ViewPBIView(DetailView):

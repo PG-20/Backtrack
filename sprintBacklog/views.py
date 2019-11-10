@@ -7,10 +7,10 @@ from .forms import AddTaskForm, AddSprintForm
 from datetime import datetime, timedelta
 from django.db.models import Sum
 from .models import Task
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 
 def endSprint(sprint):
-    if sprint:
+    if sprint and sprint.end_date:
         time_left = sprint.end_date - datetime.now()
         if time_left.total_seconds() <= 0:
             sprint.current = False
@@ -29,21 +29,23 @@ def SprintBacklogView(request):
     except Exception:
         sprints = None
     context = {
-        'title': 'Sprint Backlog'
+        'title': 'Sprint Backlog',
+        "sprint": sprints
     }
-    if not endSprint(sprints) and sprints:
+    if not endSprint(sprints) and sprints and sprints.end_date:
         time_left = sprints.end_date - datetime.now()
         sumOfEfforts = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))[
             'effort__sum'] if sprints.productbacklogitem_set.count() else 0
         sumOfEffortDone = sprints.productbacklogitem_set.all().aggregate(Sum('effort_done'))[
             'effort_done__sum'] if sprints.productbacklogitem_set.count() else 0
-        burndown = int((sumOfEffortDone/sumOfEfforts)*100)
+        burndown = int((sumOfEffortDone/sumOfEfforts)*100) if sumOfEfforts else 0
         left = sprints.capacity - sumOfEfforts
         pbis = sprints.productbacklogitem_set.all().order_by('priority')
+        sumOfStoryPoints = sprints.productbacklogitem_set.all().aggregate(Sum('story_points'))[
+            'story_points__sum'] if sprints.productbacklogitem_set.count() else 0
 
         str_time_left = str(time_left.days)+" day(s)" if time_left.days > 0 else str(time_left.seconds//3600)+" hr(s)"
         context = {
-            "sprint": sprints,
             "sprint": sprints,
             "effort": sumOfEfforts,
             "effortDone": sumOfEfforts,
@@ -51,7 +53,8 @@ def SprintBacklogView(request):
             "capacity_left": left,
             'title': "Sprint Backlog",
             "pbis": pbis,
-            "time_left": str_time_left
+            "time_left": str_time_left,
+            "cum_sp": sumOfStoryPoints
         }
 
     return render(request, 'sprint_backlog.html', context)
@@ -152,10 +155,11 @@ def DeleteTask(request, pk):
 
 def RemovePBIFromSprint(request, pk):
     pbi = ProductBacklogItem.objects.get(pk=pk)
+    pbi.sprint = None
     if pbi.status == 'P':
-        pbi.sprint = None
         pbi.status = 'TD'
         pbi.save()
-        return HttpResponse({"success": pk})
+        return JsonResponse({'successMessage': 'pbi removdd'})
     else:
-        return HttpResponse({'error': "Cannot remove done PBI"})
+        pbi.save()
+        return JsonResponse({'errorMessage': "Cannot remove done PBI"})
