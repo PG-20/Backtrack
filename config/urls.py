@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf.urls import url
 from custom_auth import views
 from django.contrib.auth import views as auth_views
 
@@ -28,4 +29,6 @@ urlpatterns = [
     path('signup/', views.SignUpView, name='signup'),
     path('products/', include('custom_auth.urls')),
     path('logout/', views.LogoutView, name='logout')
+    url(r'^accepted/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/(?P<pk>[0-9]+)/$',
+        views.AcceptInvationView, name='accepted')
 ]

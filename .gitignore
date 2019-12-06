@@ -1,6 +1,6 @@
 .idea/
 db.sqlite3
-**/migrations/**
+**/migrations/0*.py
 venv
 **/__pycache__
 .vscode/

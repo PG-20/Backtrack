@@ -13,6 +13,4 @@ urlpatterns = [
     path('<int:pk>/sprintBacklog/', sb_views.SprintBacklogView, name='sb'),
     path('<int:pk>/add-sprint/', sb_views.AddSprint.as_view(), name='add-sprint'),
     path('<int:pk>/start-sprint/', sb_views.StartSprint, name='start-sprint'),
-    url(r'^accepted/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/(?P<pk>[0-9]+)/$',
-        views.AcceptInvationView, name='accepted')
 ]
