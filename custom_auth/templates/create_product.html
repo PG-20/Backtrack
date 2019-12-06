@@ -1,0 +1,29 @@
+{% load crispy_forms_tags %}
+<div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+        <form action="{{ url }}" method="post" id="add-product" class="form">
+            {% csrf_token %}
+            <div class="modal-header">
+                <h4 class="modal-title">{{ label }}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{ form|crispy }}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <input type="submit" class="btn btn-primary" value="Save changes"/>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+    var form_options = {
+        target: '#modal',
+        success: function (response) {}
+    };
+    $('#add-product').ajaxForm(form_options);
+
+</script>

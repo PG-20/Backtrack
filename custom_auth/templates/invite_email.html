@@ -1,0 +1,5 @@
+<h1>Hi {{ user.name }}!</h1>
+
+<h3>You have been asked by {{ by }} to join the {{ name }} team.</h3>
+
+<a href="http://{{ domain }}{% url 'accepted' uidb64=uid token=token pk=pk %}"><h2>Join Team</h2></a>

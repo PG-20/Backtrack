@@ -31,7 +31,7 @@
                             </thead>
                             <tbody>
                             {% for pbi in pbis %}
-                                <tr id="row{{ pbi.id }}">
+                                <tr id="row{{ pbi.id }}-{{ forloop.parentloop.counter }}">
                                     <th scope="row">{{ pbi.id }}</th>
                                     <td>{{ pbi.title }}</td>
                                     <td>
@@ -65,12 +65,19 @@
                                                 data-url="{% url 'view-pbi' pbi.pk %}">👁
                                         </button>
                                         {% if pbi.status == 'TD' or pbi.status == 'NF' %}
-                                            <button data-toggle="modal" data-target="#modal"
-                                                    data-url="{% url 'edit-pbi' pbi.pk %}"
-                                                    class="btn">✏
-                                            </button>
-                                            {% if pbi.status == 'TD' %}
-                                                <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑</button>
+                                            {% if product.owner == user %}
+                                                <button data-toggle="modal" data-target="#modal"
+                                                        data-url="{% url 'edit-pbi' pbi.pk %}"
+                                                        class="btn">✏
+                                                </button>
+                                                {% if pbi.status == 'TD' %}
+                                                    <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑
+                                                    </button>
+                                                {% endif %}
+                                            {% endif %}
+                                            {% if not pbi.sprint and user in product.developers.all %}
+                                                <a href="{% url 'add-pbi-to-sprint' pbi.id %}" class="btn"><i
+                                                        class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                             {% endif %}
                                         {% endif %}
                                     </td>
@@ -83,10 +90,11 @@
             {% endfor %}
         {% endif %}
     </div>
-
-    <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
-        Add PBI
-    </button>
+    {% if product.owner == user %}
+        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+            Add PBI
+        </button>
+    {% endif %}
 
     <div class="modal" id="modal"></div>
 
@@ -115,10 +123,16 @@
                 url: "delete/" + id,
                 success: function (del_id) {
                     if (id == del_id) {
-                        $("#row" + id).remove();
+                        $(`[id*=row${id}]`).remove();
                     }
                 }
             });
         }
+
+        // TODO: UNIFY all ajax request into a single one, refresh ondelete
+
+        $(document).ready(function () {
+            $('#searchbarRight').append("<a href=\"{% url 'sb' product.id %}\" class=\"btn btn-light h4\">Sprint Backlog</a>");
+        });
     </script>
 {% endblock %}

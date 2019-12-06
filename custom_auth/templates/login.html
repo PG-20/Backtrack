@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% load static %}
+{% load widget_tweaks %}
+{% block content %}
+    <div style="background-color: #383838"
+         class="w-100 h-100 d-flex flex-column align-items-center justify-content-around">
+        <div class="w-100 h-75 d-flex flex-column align-items-center justify-content-around">
+            <img src="{% static "images/logo_transparent_yellow.png" %}" alt="img"
+                 class="center"
+                 style="width: 400px;">
+
+            <form method="post" action="{% url 'login' %}"
+                  class="w-75 h-50 d-flex flex-column align-items-center justify-content-between">
+                {% csrf_token %}
+                <div class="row d-flex flex-row justify-content-between w-100">
+                    {% render_field form.username placeholder="EMAIL" class+="col-5 rounded custom_input" %}
+                    {% render_field form.password placeholder="PASSWORD" class+="col-5 rounded custom_input" %}
+                </div>
+                {% if form.errors %}
+                    <p>Your username and password didn't match. Please try again.</p>
+                {% endif %}
+                <input type="submit" value="LOGIN" class="btn btn-custom">
+                <p></p>
+                <a href="{% url 'signup' %}" class="btn-custom btn">SIGNUP</a>
+                <input type="hidden" name="next" value="{{ next }}">
+            </form>
+        </div>
+    </div>
+    <script>
+        document.getElementById('main2').style.padding = '0';
+    </script>
+{% endblock %}

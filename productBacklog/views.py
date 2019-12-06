@@ -1,22 +1,19 @@
-from django.shortcuts import render, redirect
-from django.views.generic.edit import UpdateView, CreateView
+from django.shortcuts import render, redirect, get_object_or_404
+from django.views.generic.edit import CreateView
 from django.views.generic.detail import DetailView
-from django.http import HttpResponse
 from sprintBacklog.views import endSprint
 from products.models import Sprint
-from datetime import datetime, timedelta
-
+from datetime import datetime
+from django.http import HttpResponse
 from .models import ProductBacklogItem
 from .forms import ProductBacklogForm
-import logging
-
-logger = logging.getLogger(__name__)
-
-def index(request):
-    return redirect('product_backlog/')
+from custom_auth.models import Product
+from django.contrib.auth.views import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
-def ProductBacklogView(request):
+@login_required
+def ProductBacklogView(request, pk):
     try:
         sprint = Sprint.objects.get(current=True)
     except Exception:
@@ -38,16 +35,17 @@ def ProductBacklogView(request):
         cumsp = cumsp + pbis2[i].story_points
         pbis2[i].cumsp = cumsp
 
-    context = {'title': "Product Backlog", 'pbiList': [pbis, pbis2]}
+    context = {'title': "Product Backlog", 'pbiList': [pbis, pbis2], 'product': Product.objects.get(pk=pk)}
     return render(request, 'product_backlog.html', context)
 
-class ViewPBIView(DetailView):
+
+class ViewPBIView(LoginRequiredMixin, DetailView):
     model = ProductBacklogItem
     context_object_name = 'pbi'
     template_name = 'viewPBI.html'
 
 
-class AddPBIView(CreateView):
+class AddPBIView(LoginRequiredMixin, CreateView):
     form_class = ProductBacklogForm
     template_name = 'add_product_backlog_item.html'
 
@@ -58,26 +56,20 @@ class AddPBIView(CreateView):
         return context
 
     def form_valid(self, form):
-        form.save()
+        pbi = form.save(commit=False)
+        pbi.product = self.request.user.productOwned
+        pbi.save()
         return render(self.request, 'updateSuccess.html', {'message': "PBI added successfully"})
 
 
+@login_required
 def EditPBIView(request, pk):
-    pbi=ProductBacklogItem.objects.get(pk=pk)
+    pbi = ProductBacklogItem.objects.get(pk=pk)
     prevPriority = pbi.priority
     form = ProductBacklogForm(request.POST or None, instance=pbi)
     if request.method == "POST":
         if form.is_valid():
             pbi = form.save(commit=False)
-
-            if form.cleaned_data['add_to_current_sprint']:
-                sprint = Sprint.objects.get(current=True)
-                if sprint.status == 'NS':
-                    sprint.status = 'P'
-                    sprint.end_date = datetime.now() + timedelta(days=15)
-                    sprint.save()
-                pbi.sprint = sprint
-                pbi.status = 'P'
 
             if form.has_changed():
                 pbi.last_updated = datetime.now()
@@ -109,6 +101,18 @@ def EditPBIView(request, pk):
     }
     return render(request, "add_product_backlog_item.html", context)
 
+
+@login_required
 def DeletePBI(request, pk):
     ProductBacklogItem.objects.get(pk=pk).delete()
     return HttpResponse(pk)
+
+
+@login_required
+def AddPBIToCurrentSprint(request, pk):
+    pbi = ProductBacklogItem.objects.get(pk=pk)
+    sprint = get_object_or_404(Sprint, current=True)
+    pbi.sprint = sprint
+    pbi.status = 'P'
+    pbi.save()
+    return redirect('pb', pk=pbi.product.id)

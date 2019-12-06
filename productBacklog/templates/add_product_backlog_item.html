@@ -25,11 +25,6 @@
                     <div class="col-4">
                         {{ form.pbi_type|as_crispy_field }}
                     </div>
-                    {% if pbi and not pbi.sprint or not pbi %}
-                        <div class="col-4">
-                            {{ form.add_to_current_sprint|as_crispy_field }}
-                        </div>
-                    {% endif %}
                 </div>
             </div>
             <div class="modal-footer">

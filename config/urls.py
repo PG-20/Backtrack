@@ -15,12 +15,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from productBacklog.views import index
-
+from custom_auth import views
+from django.contrib.auth import views as auth_views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', index, name='index'),
-    path('product_backlog/', include('productBacklog.urls')),
-    path('sprint_backlog/', include('sprintBacklog.urls'))
+    path('', views.index, name='index'),
+    path('pbi/', include('productBacklog.urls')),
+    path('sprint_backlog/', include('sprintBacklog.urls')),
+    path('login/', auth_views.LoginView.as_view(template_name='login.html', extra_context={'title': "Login"}),
+         name='login'),
+    path('signup/', views.SignUpView, name='signup'),
+    path('products/', include('custom_auth.urls')),
+    path('logout/', views.LogoutView, name='logout')
 ]

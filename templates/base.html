@@ -1,11 +1,13 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="w-100 h-100">
 <head>
     {% load static %}
     <title>BackTrack</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css"
+          integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
@@ -69,11 +71,13 @@
     /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
     #main {
         transition: margin-left .5s; /* If you want a transition effect */
+        width: 100%;
+        height: 100%;
     {#padding: 20px;#}
     }
 
     #main2 {
-    {#transition: margin-left .5s; /* If you want a transition effect */#} padding: 20px;
+        padding: 20px;
     }
 
     /* On smaller screens, where height is less than 450px, change the style of the sidenav (less padding and a smaller font size) */
@@ -86,6 +90,30 @@
             font-size: 18px;
         }
     }
+
+    .custom_input::placeholder {
+        color: #FFC40C
+    }
+
+    .custom_input:focus {
+        outline: none;
+    }
+
+    .custom_input {
+        height: 40px;
+        width: 350px;
+        padding-left: 10px;
+        background-color: transparent !important;
+        color: #FFC40C !important;
+        border: 1px solid #FFC40C
+    }
+
+    .btn-custom {
+        background-color: #FFC40C;
+        color: #383838;
+        height: 40px;
+        width: 250px;
+    }
 </style>
 <body style="height: 100%; width: 100%">
 <div id="mySidebar" class="sidebar">
@@ -93,19 +121,40 @@
          class="center"
          style="width: 250px">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-    <a href="{% url 'pb' %}">Product Backlog</a>
-    <a href="{% url 'sb' %}">Sprint Backlog</a>
-    <a href="#">Clients</a>
-    <a href="#">Contact</a>
+    {% if user.is_authenticated %}
+        <br/>
+        <a class="h4">Hi {{ user.name }}!</a>
+        <br/>
+        <a href="{% url 'products' %}">Product{{ user.role|pluralize }}</a>
+        <a href="#">Clients</a>
+        <a href="#">Contact</a>
+        <a href="{% url 'logout' %}">Logout</a>
+    {% endif %}
 </div>
 
 <div id="main">
     <div style="background-color: #FFC40E; height: 50px; margin-right: 0" class="row align-items-center">
-        <div class="col-lg-12">
-            <h3><button class="openbtn" onclick="openNav()">&#9776;</button>   <span class="text-white-heading">{{ title }}</span></h3>
+        <div class="col-lg-8">
+            <h3>
+                <button class="openbtn" onclick="openNav()">&#9776;</button>
+                <span class="text-white-heading">{{ title }}</span></h3>
+        </div>
+        <div class="col-lg-4 d-flex flex-row justify-content-end" id="searchbarRight">
+            {% if user.is_authenticated and product %}
+                {% if product.owner == user %}
+                    <button data-toggle="modal" data-target="#modal"
+                            data-url="{% url 'edit-product' product.pk %}"
+                            class="btn btn-light h4" style="margin-right: 5px">Edit Product
+                    </button>
+                {% endif %}
+                <button data-toggle="modal" data-target="#modal"
+                        data-url="{% url 'view-product' product.pk %}"
+                        class="btn btn-light h4" style="margin-right: 5px">View Product
+                </button>
+            {% endif %}
         </div>
     </div>
-    <div id="main2">
+    <div id="main2" class="h-100 w-100">
         {% block content %}
         {% endblock %}
     </div>

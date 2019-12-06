@@ -7,17 +7,17 @@
                 <div class="d-flex justify-content-between">
                     <h2>Sprint {{ sprint.id }}
                         <small class="text-muted">
-                            {% if time_left %}
+                            {% if pbis %}
                                 Capacity left: {{ capacity_left }}hr{{ capacity_left|pluralize }}
                             {% else %}
-                                Add PBIs from Product Backlog to start sprint
+                                Start adding PBIs from the Product Backlog
                             {% endif %}
                         </small>
                     </h2>
-                    {% if time_left %}
-                        <h5 class="text-muted">Cumulative Story Points: {{ cum_sp }}&emsp;Time
-                            left: {{ time_left }}&emsp;{{ sprint.get_status_display }}</h5>
-                    {% endif %}
+
+                    <h5 class="text-muted">Cumulative Story Points: {{ cum_sp }}&emsp;Time
+                        left: {{ time_left }}&emsp;{{ sprint.get_status_display }}</h5>
+
                 </div>
                 {% if capacity_left < 0 %}
                     <h5 class="text-danger">Capacity exceeded: remove some PBIs</h5>
@@ -27,7 +27,7 @@
                          style="width: 0; font-size: 10px; transition: 1s"
                          aria-valuenow="{{ burndown }}" aria-valuemin="0"
                          aria-valuemax="100">
-                        {% if time_left %}
+                        {% if pbis %}
                             Sprint {{ burndown }}% completed
                         {% endif %}
                     </div>
@@ -77,43 +77,64 @@
                                             <p class="card-text"> {{ task.description }} </p>
 
                                         </div>
-                                        <div class="card-footer d-flex bg-transparent justify-content-between align-items-center">
-                                            <button data-toggle="modal" data-target="#modal"
-                                                    data-url="{% url 'edit-task' task.pk %}"
-                                                    class="btn"
-                                                    style="font-size: 15px"
-                                            >✏
-                                            </button>
-                                            <button onclick="onDeleteTask(event, {{ task.pk }})" class="btn"
-                                                    style="font-size: 15px">🗑
-                                            </button>
-                                        </div>
+                                        {% if user.developing == product %}
+                                            <div class="card-footer d-flex bg-transparent justify-content-between align-items-center">
+                                                <button data-toggle="modal" data-target="#modal"
+                                                        data-url="{% url 'edit-task' task.pk %}"
+                                                        class="btn"
+                                                        style="font-size: 15px"
+                                                >✏
+                                                </button>
+                                                <button onclick="onDeleteTask(event)"
+                                                        data-url="{% url 'remove-pbi-from-sprint' task.pk %}"
+                                                        class="btn"
+                                                        style="font-size: 15px">🗑
+                                                </button>
+                                            </div>
+                                        {% endif %}
                                     </div>
                                 {% endfor %}
                             </div>
-                            <div class="card-footer d-flex justify-content-between">
-                                <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-task' pbi.pk %}"
-                                        class="btn btn-danger">
-                                    Add Task
-                                </button>
-                                <button onclick="onRemovePBI(event, {{ pbi.pk }})" class="btn btn-danger">Remove PBI
-                                    from
-                                    Sprint
-                                </button>
-                            </div>
+                            {% if user.developing == product %}
+                                <div class="card-footer d-flex justify-content-between">
+                                    <button data-toggle="modal" data-target="#modal"
+                                            data-url="{% url 'add-task' pbi.pk %}"
+                                            class="btn btn-danger">
+                                        Add Task
+                                    </button>
+                                    <button onclick="onRemovePBI(event, {{ pbi.pk }})" class="btn btn-danger">Remove PBI
+                                        from
+                                        Sprint
+                                    </button>
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 {% endfor %}
             </div>
+            {% if sprint.status == 'NS' %}
+                <div style="margin: 10px">
+                    <a href="{% url 'start-sprint' user.developing.id %}" class="btn btn-danger">
+                        Start Sprint
+                    </a>
+                </div>
+            {% endif %}
         </div>
     {% else %}
         <br/>
-        <div>
-            <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' %}" class="btn btn-danger">
-                Add Sprint
-            </button>
+        <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
+            {% if user.developing == product %}
+                <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' user.developing.id %}"
+                        class="btn btn-danger">
+                    Add Sprint
+                </button>
+            {% else %}
+                <span class="h4">Please ask a member of the development team to add a sprint to view more details.</span>
+            {% endif %}
         </div>
     {% endif %}
+
+    </div>
     <div class="modal" id="modal"></div>
     <script>
         $('#modal').on('show.bs.modal', function (event) {
@@ -134,7 +155,7 @@
 
         function onDeleteTask(e, id) {
             $.ajax({
-                url: "delete/" + id,
+                url: $(e.target).data('url'),
                 success: function (del_id) {
                     window.location.reload()
                 }
@@ -143,7 +164,7 @@
 
         function onRemovePBI(e, id) {
             $.ajax({
-                url: "remove-pbi/" + id,
+                url: $(e.target).data('url'),
                 success: function (res) {
                     console.log(res);
                     if (res) {
@@ -154,5 +175,9 @@
                 }
             });
         }
+
+        $(document).ready(function () {
+            $('#searchbarRight').append("<a href=\"{% url 'pb' product.id %}\" class=\"btn btn-light h4\">Product Backlog</a>")
+        });
     </script>
 {% endblock %}

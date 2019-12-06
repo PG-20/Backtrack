@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% block content %}
+    <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
+        {% if welcome %}
+            <span class="h5">Hi {{ user.name }}! You are now a part of the {{ product }} team.</span>
+        {% elif user.role == 1 %}
+            <span class="h4">You have not been assigned to any Projects.</span>
+            <span class="h5 text-center text-muted">You may make a new product by clicking the button below or ask a product owner to assign you to that project.</span>
+            <button class="btn btn-light" data-toggle="modal" data-target="#modal"
+                    data-url="{% url 'add-product' %}">Create Product
+            </button>
+        {% else %}
+            {% if products %}
+                <table class="table table-hover text-center">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Name</th>
+                        <th scope="col">Owner</th>
+                        <th scope="col">Created On</th>
+                        <th scope="col">Sprint Length</th>
+                        <th scope="col">Developers</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for product in products %}
+                        <tr id="{{ forloop.counter }}" onclick="window.location.replace(`{% url 'pb' product.id %}`)">
+                            <th scope="row">{{ product.id }}</th>
+                            <td>{{ product.name }}</td>
+                            <td>{{ product.owner }}</td>
+                            <td>{{ product.created_at }}</td>
+                            <td>{{ product.sprint_length }}</td>
+                            <td class="d-flex flex-row align-items-center justify-content-center">
+                                {% for dev in product.developers.all %}
+                                    <div class="d-flex align-items-center justify-content-center"
+                                         data-toggle="tooltip" data-placement="top" title="{{ dev.name }}"
+                                         style="height: 45px;background-color: #FFC40E; width: 45px; border-radius: 50%; cursor: default; margin: 0 2px">
+                                                 <span class="text-white"
+                                                       style="font-size: 25px; font-weight: 100">{{ dev.name | capfirst | make_list | first }}</span>
+                                    </div>
+                                {% endfor %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <span class="h4">There are no products to view at this time</span>
+            {% endif %}
+        {% endif %}
+    </div>
+    <div class="modal" id="modal"></div>
+    <script>
+        {% if welcome %}
+            setTimeout(function () {
+                window.location.replace("{% url 'pb' product.id %}")
+            }, 2000);
+        {% endif %}
+
+        $('#modal').on('show.bs.modal', function (event) {
+            var button = $(event.relatedTarget);
+            var url = button.data('url');
+            var modal = $(this);
+            $.ajax({
+                url: url,
+                context: document.body
+            }).done(function (response) {
+                modal.html(response);
+            });
+        });
+    </script>
+{% endblock %}

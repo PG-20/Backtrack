@@ -1,13 +1,16 @@
-from django.shortcuts import render
-from django.views.generic.edit import UpdateView, CreateView
+from django.shortcuts import render, redirect
+from django.views.generic.edit import CreateView
 from products.models import Sprint
-from django.views.generic.detail import DetailView
 from productBacklog.models import ProductBacklogItem
 from .forms import AddTaskForm, AddSprintForm
 from datetime import datetime, timedelta
 from django.db.models import Sum
 from .models import Task
+from custom_auth.models import Product
 from django.http import HttpResponse, JsonResponse
+from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.views import login_required
+
 
 def endSprint(sprint):
     if sprint and sprint.end_date:
@@ -23,46 +26,45 @@ def endSprint(sprint):
             return True
     return False
 
-def SprintBacklogView(request):
-    try:
-        sprints = Sprint.objects.get(current=True)
-    except Exception:
-        sprints = None
+
+@login_required
+def SprintBacklogView(request, pk):
     context = {
         'title': 'Sprint Backlog',
-        "sprint": sprints
+        'product': Product.objects.get(pk=pk)
     }
-    if not endSprint(sprints) and sprints and sprints.end_date:
-        time_left = sprints.end_date - datetime.now()
-        sumOfEfforts = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))[
-            'effort__sum'] if sprints.productbacklogitem_set.count() else 0
-        sumOfEffortDone = sprints.productbacklogitem_set.all().aggregate(Sum('effort_done'))[
-            'effort_done__sum'] if sprints.productbacklogitem_set.count() else 0
-        burndown = int((sumOfEffortDone/sumOfEfforts)*100) if sumOfEfforts else 0
-        left = sprints.capacity - sumOfEfforts
-        pbis = sprints.productbacklogitem_set.all().order_by('priority')
-        sumOfStoryPoints = sprints.productbacklogitem_set.all().aggregate(Sum('story_points'))[
-            'story_points__sum'] if sprints.productbacklogitem_set.count() else 0
+    try:
+        sprints = Sprint.objects.get(current=True)
+    except Sprint.DoesNotExist:
+        sprints = None
+    context['sprint'] = sprints
+    if not endSprint(sprints) and sprints:
+        if sprints.end_date:
+            time_left = sprints.end_date - datetime.now()
+            context['time_left'] = str(time_left.days) + " day(s)" if time_left.days > 0 else str(
+                time_left.seconds // 3600) + " hr(s)"
 
-        str_time_left = str(time_left.days)+" day(s)" if time_left.days > 0 else str(time_left.seconds//3600)+" hr(s)"
-        context = {
-            "sprint": sprints,
-            "effort": sumOfEfforts,
-            "effortDone": sumOfEfforts,
-            "burndown": burndown,
-            "capacity_left": left,
-            'title': "Sprint Backlog",
-            "pbis": pbis,
-            "time_left": str_time_left,
-            "cum_sp": sumOfStoryPoints
-        }
+        context['effort'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))['effort__sum']
+        context['effortDone'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort_done'))[
+            'effort_done__sum'] if sprints.productbacklogitem_set.count() else 0
+        context["burndown"] = int((context['effortDone'] / context['effort']) * 100) if context['effort'] else 0
+        context['capacity_left'] = sprints.capacity - (context['effort'] if context['effort'] else 0)
+        context['pbis'] = sprints.productbacklogitem_set.all().order_by(
+            'priority') if sprints.productbacklogitem_set.count() else None
+        context['cum_sp'] = sprints.productbacklogitem_set.all().aggregate(Sum('story_points'))[
+            'story_points__sum'] if sprints.productbacklogitem_set.count() else 0
 
     return render(request, 'sprint_backlog.html', context)
 
 
-class AddTask(CreateView):
+class AddTask(LoginRequiredMixin, CreateView):
     form_class = AddTaskForm
     template_name = 'task.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(AddTask, self).get_form_kwargs()
+        kwargs['product'] = self.request.user.developing
+        return kwargs
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -82,26 +84,39 @@ class AddTask(CreateView):
         return render(self.request, 'updateSuccess.html', {'message': "Task was successfully added"})
 
 
-class AddSprint(CreateView):
+class AddSprint(LoginRequiredMixin, CreateView):
     form_class = AddSprintForm
     template_name = 'add_sprint.html'
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
+    def get_context_data(self):
+        context = super().get_context_data()
         context['label'] = "Add Sprint"
         context['url'] = self.request.get_full_path()
         return context
 
     def form_valid(self, form):
-        form.save()
+        sprint = form.save(commit=False)
+        sprint.product = Product.objects.get(pk=self.kwargs['pk'])
+        sprint.save()
         return render(self.request, 'updateSuccess.html', {'message': "Sprint was added successfully"})
 
 
+@login_required
+def StartSprint(request, pk):
+    sprint = Sprint.objects.get(current=True)
+    if sprint.status == 'NS':
+        sprint.status = 'P'
+        sprint.end_date = datetime.now() + timedelta(days=Product.objects.get(pk=pk).sprint_length)
+        sprint.save()
+        return redirect('sb', sprint.product.id)
+
+
+@login_required
 def EditTask(request, *args, **kwargs):
     task = Task.objects.get(pk=kwargs['pk'])
     prevTaskEffort = task.effort
     prevStatus = task.status
-    form = AddTaskForm(request.POST or None, instance=task)
+    form = AddTaskForm(request.user.developing, request.POST or None, instance=task)
     if request.method == "POST":
         if form.is_valid():
             taskUpdated = form.save(commit=False)
@@ -136,6 +151,7 @@ def EditTask(request, *args, **kwargs):
     return render(request, "task.html", context)
 
 
+@login_required
 def DeleteTask(request, pk):
     task = Task.objects.get(pk=pk)
     pbi = task.pbi
@@ -153,13 +169,14 @@ def DeleteTask(request, pk):
     return HttpResponse(pk)
 
 
+@login_required
 def RemovePBIFromSprint(request, pk):
     pbi = ProductBacklogItem.objects.get(pk=pk)
     pbi.sprint = None
     if pbi.status == 'P':
         pbi.status = 'TD'
         pbi.save()
-        return JsonResponse({'successMessage': 'pbi removdd'})
+        return JsonResponse({'successMessage': 'pbi removed'})
     else:
         pbi.save()
         return JsonResponse({'errorMessage': "Cannot remove done PBI"})
