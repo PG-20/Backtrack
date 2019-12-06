@@ -56,20 +56,22 @@ def SignUpView(request):
 @login_required
 def AddProductView(request, *args, **kwargs):
     form = ProductForm(request.user, request.POST or None,
-                       instance=Product.objects.get(pk=kwargs['pk']) if kwargs['pk'] else None)
+                       instance=Product.objects.get(pk=kwargs['pk']) if 'pk' in kwargs else None)
     if request.method == 'POST':
         if form.is_valid():
             product = form.save(commit=False)
             successContext = dict()
-            successContext['message'] = 'Product edited successfully.' if kwargs[
-                'pk'] else 'Product added successfully.'
-            product.owner = product.owner or request.user
+            successContext['message'] = 'Product edited successfully.' if 'pk' in kwargs else 'Product added successfully.'
+            try:
+                product.owner = product.owner
+            except CustomUser.DoesNotExist:
+                product.owner = request.user
             product.save()
+            newDevelopers = []
             if 'developers' in form.changed_data:
-                former_developers = product.developers.all()
-                product.developers.clear()
                 for dev in form.cleaned_data['developers']:
-                    if dev not in former_developers:
+                    if dev not in product.developers.all():
+                        newDevelopers.append(dev)
                         current_site = get_current_site(request)
                         mail_subject = 'You have been added to a team.'
                         print(urlsafe_base64_encode(force_bytes(dev.pk)))
@@ -88,7 +90,9 @@ def AddProductView(request, *args, **kwargs):
                         )
                         email.content_subtype = "html"
                         email.send()
-                    else:
+                product.developers.clear()
+                for dev in form.cleaned_data['developers']:
+                    if dev not in newDevelopers:
                         product.developers.add(dev)
 
             return render(request, 'updateSuccess.html', successContext)

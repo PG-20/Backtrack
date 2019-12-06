@@ -38,5 +38,6 @@ class ProductForm(forms.ModelForm):
             Q(productOwned__isnull=True, role__exact=1) & (
                         Q(developing__isnull=True) | Q(developing=self.instance))).exclude(email=user.email)
         self.fields['developers'].initial = self.instance and self.instance.developers.all()
-        self.fields['name'].disabled = not not self.instance
-        self.fields['sprint_length'].disabled = not not self.instance
+        self.fields['developers'].required = False
+        self.fields['name'].disabled = not self.instance
+        self.fields['sprint_length'].disabled = not self.instance
