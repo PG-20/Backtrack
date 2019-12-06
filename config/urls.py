@@ -28,7 +28,7 @@ urlpatterns = [
          name='login'),
     path('signup/', views.SignUpView, name='signup'),
     path('products/', include('custom_auth.urls')),
-    path('logout/', views.LogoutView, name='logout')
+    path('logout/', views.LogoutView, name='logout'),
     url(r'^accepted/(?P<uidb64>[0-9A-Za-z_\-]+)/(?P<token>[0-9A-Za-z]{1,13}-[0-9A-Za-z]{1,20})/(?P<pk>[0-9]+)/$',
         views.AcceptInvationView, name='accepted')
 ]

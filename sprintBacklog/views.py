@@ -38,21 +38,25 @@ def SprintBacklogView(request, pk):
     except Sprint.DoesNotExist:
         sprints = None
     context['sprint'] = sprints
-    if not endSprint(sprints) and sprints:
-        if sprints.end_date:
-            time_left = sprints.end_date - datetime.now()
-            context['time_left'] = str(time_left.days) + " day(s)" if time_left.days > 0 else str(
-                time_left.seconds // 3600) + " hr(s)"
+    if sprints:
+        if not endSprint(sprints):
+            if sprints.end_date:
+                time_left = sprints.end_date - datetime.now()
+                context['time_left'] = str(time_left.days) + " day(s)" if time_left.days > 0 else str(
+                    time_left.seconds // 3600) + " hr(s)"
 
-        context['effort'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))['effort__sum']
-        context['effortDone'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort_done'))[
-            'effort_done__sum'] if sprints.productbacklogitem_set.count() else 0
-        context["burndown"] = int((context['effortDone'] / context['effort']) * 100) if context['effort'] else 0
-        context['capacity_left'] = sprints.capacity - (context['effort'] if context['effort'] else 0)
-        context['pbis'] = sprints.productbacklogitem_set.all().order_by(
-            'priority') if sprints.productbacklogitem_set.count() else None
-        context['cum_sp'] = sprints.productbacklogitem_set.all().aggregate(Sum('story_points'))[
-            'story_points__sum'] if sprints.productbacklogitem_set.count() else 0
+            context['effort'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort'))['effort__sum']
+            context['effortDone'] = sprints.productbacklogitem_set.all().aggregate(Sum('effort_done'))[
+                'effort_done__sum'] if sprints.productbacklogitem_set.count() else 0
+            context["burndown"] = int((context['effortDone'] / context['effort']) * 100) if context['effort'] else 0
+            context['capacity_left'] = sprints.capacity - (context['effort'] if context['effort'] else 0)
+            context['pbis'] = sprints.productbacklogitem_set.all().order_by(
+                'priority') if sprints.productbacklogitem_set.count() else None
+            context['cum_sp'] = sprints.productbacklogitem_set.all().aggregate(Sum('story_points'))[
+                'story_points__sum'] if sprints.productbacklogitem_set.count() else 0
+        else:
+            del context['sprint']
+            context['end_message'] = "This sprint has ended."
 
     return render(request, 'sprint_backlog.html', context)
 

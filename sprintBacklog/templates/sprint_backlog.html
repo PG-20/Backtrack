@@ -9,6 +9,8 @@
                         <small class="text-muted">
                             {% if pbis %}
                                 Capacity left: {{ capacity_left }}hr{{ capacity_left|pluralize }}
+                            {% elif end_message %}
+                                {{ end_message }}
                             {% else %}
                                 Start adding PBIs from the Product Backlog
                             {% endif %}
@@ -79,12 +81,14 @@
                                         </div>
                                         {% if user.developing == product %}
                                             <div class="card-footer d-flex bg-transparent justify-content-between align-items-center">
-                                                <button data-toggle="modal" data-target="#modal"
-                                                        data-url="{% url 'edit-task' task.pk %}"
-                                                        class="btn"
-                                                        style="font-size: 15px"
-                                                >✏
-                                                </button>
+                                                {% if sprint.status == 'P' %}
+                                                    <button data-toggle="modal" data-target="#modal"
+                                                            data-url="{% url 'edit-task' task.pk %}"
+                                                            class="btn"
+                                                            style="font-size: 15px"
+                                                    >✏
+                                                    </button>
+                                                {% endif %}
                                                 <button onclick="onDeleteTask(event)"
                                                         data-url="{% url 'remove-pbi-from-sprint' task.pk %}"
                                                         class="btn"
@@ -124,12 +128,13 @@
         <br/>
         <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
             {% if user.developing == product %}
+                <span class="h4">To start development please add a sprint.</span>
                 <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' user.developing.id %}"
                         class="btn btn-danger">
                     Add Sprint
                 </button>
             {% else %}
-                <span class="h4">Please ask a member of the development team to add a sprint to view more details.</span>
+                <span class="h4">{{ end_message }} Please ask a member of the development team to add a sprint to view more details.</span>
             {% endif %}
         </div>
     {% endif %}

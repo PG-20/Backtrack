@@ -35,7 +35,7 @@ def ProductBacklogView(request, pk):
         cumsp = cumsp + pbis2[i].story_points
         pbis2[i].cumsp = cumsp
 
-    context = {'title': "Product Backlog", 'pbiList': [pbis, pbis2], 'product': Product.objects.get(pk=pk)}
+    context = {'title': "Product Backlog", 'pbiList': [pbis, pbis2], 'product': Product.objects.get(pk=pk), 'sprint': sprint}
     return render(request, 'product_backlog.html', context)
 
 

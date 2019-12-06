@@ -75,7 +75,7 @@
                                                     </button>
                                                 {% endif %}
                                             {% endif %}
-                                            {% if not pbi.sprint and user in product.developers.all %}
+                                            {% if not pbi.sprint and user in product.developers.all and sprint %}
                                                 <a href="{% url 'add-pbi-to-sprint' pbi.id %}" class="btn"><i
                                                         class="fa fa-plus-circle" aria-hidden="true"></i></a>
                                             {% endif %}
@@ -122,14 +122,10 @@
             $.ajax({
                 url: "delete/" + id,
                 success: function (del_id) {
-                    if (id == del_id) {
-                        $(`[id*=row${id}]`).remove();
-                    }
+                    window.location.reload()
                 }
             });
         }
-
-        // TODO: UNIFY all ajax request into a single one, refresh ondelete
 
         $(document).ready(function () {
             $('#searchbarRight').append("<a href=\"{% url 'sb' product.id %}\" class=\"btn btn-light h4\">Sprint Backlog</a>");

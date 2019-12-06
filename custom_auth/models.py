@@ -27,6 +27,7 @@ class Product(models.Model):
     name = models.CharField(max_length=30)
     created_at = models.DateField(auto_now_add=True)
     sprint_length = models.PositiveSmallIntegerField(default=15)
+    description = models.TextField(null=True, blank=True, max_length=500)
 
     def __str__(self):
         return self.name

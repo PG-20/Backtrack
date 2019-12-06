@@ -122,7 +122,6 @@
          style="width: 250px">
     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
     {% if user.is_authenticated %}
-        <br/>
         <a class="h4">Hi {{ user.name }}!</a>
         <br/>
         <a href="{% url 'products' %}">Product{{ user.role|pluralize }}</a>

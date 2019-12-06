@@ -3,7 +3,7 @@ from custom_auth.models import CustomUser,Product
 
 
 class Sprint(models.Model):
-    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sprint')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE, related_name='sprints')
     current = models.BooleanField(default=True)
     capacity = models.PositiveSmallIntegerField()
     total_effort = models.PositiveSmallIntegerField(default=0)

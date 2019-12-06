@@ -60,11 +60,16 @@ def AddProductView(request, *args, **kwargs):
     if request.method == 'POST':
         if form.is_valid():
             product = form.save(commit=False)
+            successContext = dict()
+            successContext['message'] = 'Product edited successfully.' if kwargs[
+                'pk'] else 'Product added successfully.'
             product.owner = product.owner or request.user
             product.save()
             if 'developers' in form.changed_data:
+                former_developers = product.developers.all()
+                product.developers.clear()
                 for dev in form.cleaned_data['developers']:
-                    if dev not in product.developers.all():
+                    if dev not in former_developers:
                         current_site = get_current_site(request)
                         mail_subject = 'You have been added to a team.'
                         print(urlsafe_base64_encode(force_bytes(dev.pk)))
@@ -83,9 +88,10 @@ def AddProductView(request, *args, **kwargs):
                         )
                         email.content_subtype = "html"
                         email.send()
+                    else:
+                        product.developers.add(dev)
 
-            return render(request, 'updateSuccess.html',
-                          {'message': 'Product successfully created. All Developers have been sent invitation emails.'})
+            return render(request, 'updateSuccess.html', successContext)
     else:
         context = {
             'form': form,
@@ -106,7 +112,8 @@ def AcceptInvationView(request, uidb64, token, pk):
     if request.user != user:
         logout(request)
         return redirect('/login/?next=' + request.path)
-    if user is not None and account_activation_token.check_token(user, token):
+    if user is not None and account_activation_token.check_token(user, token) and not (
+            user.developing or user.productOwned):
         user.developing = product
         user.save()
 
@@ -115,11 +122,9 @@ def AcceptInvationView(request, uidb64, token, pk):
         return HttpResponse('Link seems to be invalid!')
 
 
-# TODO: Add HTML to email
-# TODO: Check if dev already had a product or is developing
 # TODO: 404 and 500 handlers
 # TODO: Add help text and error text for login/signup
-
+# TODO: Better Code Organization/Structure
 
 
 class ProductDetailsView(LoginRequiredMixin, DetailView):
