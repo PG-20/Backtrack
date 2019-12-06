@@ -117,7 +117,7 @@ def AcceptInvationView(request, uidb64, token, pk):
         logout(request)
         return redirect('/login/?next=' + request.path)
     if user is not None and account_activation_token.check_token(user, token) and not (
-            user.developing or user.productOwned):
+            user.developing or hasattr(user, 'productOwned')):
         user.developing = product
         user.save()
 

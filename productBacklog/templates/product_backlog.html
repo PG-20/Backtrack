@@ -71,7 +71,8 @@
                                                         class="btn">✏
                                                 </button>
                                                 {% if pbi.status == 'TD' %}
-                                                    <button onclick="onDelete(event, {{ pbi.id }})" class="btn">🗑
+                                                    <button onclick="onDelete(event)"
+                                                            data-url="{% url 'delete-pbi' pbi.id %}" class="btn">🗑
                                                     </button>
                                                 {% endif %}
                                             {% endif %}
@@ -118,9 +119,9 @@
             });
         });
 
-        function onDelete(e, id) {
+        function onDelete(e) {
             $.ajax({
-                url: "delete/" + id,
+                url: $(e.target).data('url'),
                 success: function (del_id) {
                     window.location.reload()
                 }
