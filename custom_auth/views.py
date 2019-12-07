@@ -127,7 +127,6 @@ def AcceptInvationView(request, uidb64, token, pk):
 
 
 # TODO: 404 and 500 handlers
-# TODO: Add help text and error text for login/signup
 # TODO: Better Code Organization/Structure
 
 

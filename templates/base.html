@@ -58,14 +58,14 @@
         font-size: 20px;
         cursor: pointer;
         background-color: #111;
-        color: white;
+        color: #FFC40E;
         padding: 10px 15px;
         border: none;
         height: 50px;
     }
 
     .openbtn:hover {
-        background-color: #444;
+        background-color: #383838;
     }
 
     /* Style page content - use this if you want to push the page content to the right when you open the side navigation */
@@ -108,6 +108,15 @@
         border: 1px solid #FFC40C
     }
 
+    .colored-text {
+        color: #FFC40C !important;
+    }
+
+    .backDark {
+        background-color: #383838;
+        border: none;
+    }
+
     .btn-custom {
         background-color: #FFC40C;
         color: #383838;
@@ -143,12 +152,12 @@
                 {% if product.owner == user %}
                     <button data-toggle="modal" data-target="#modal"
                             data-url="{% url 'edit-product' product.pk %}"
-                            class="btn btn-light h4" style="margin-right: 5px">Edit Product
+                            class="btn btn-dark h4 backDark colored-text" style="margin-right: 5px">Edit Product
                     </button>
                 {% endif %}
                 <button data-toggle="modal" data-target="#modal"
                         data-url="{% url 'view-product' product.pk %}"
-                        class="btn btn-light h4" style="margin-right: 5px">View Product
+                        class="btn h4 btn-dark backDark colored-text" style="margin-right: 5px">View Product
                 </button>
             {% endif %}
         </div>

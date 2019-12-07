@@ -103,10 +103,10 @@
                                 <div class="card-footer d-flex justify-content-between">
                                     <button data-toggle="modal" data-target="#modal"
                                             data-url="{% url 'add-task' pbi.pk %}"
-                                            class="btn btn-danger">
+                                            class="btn btn-dark backDark colored-text">
                                         Add Task
                                     </button>
-                                    <button onclick="onRemovePBI(event, {{ pbi.pk }})" class="btn btn-danger">Remove PBI
+                                    <button onclick="onRemovePBI(event, {{ pbi.pk }})" class="btn btn-dark backDark colored-text">Remove PBI
                                         from
                                         Sprint
                                     </button>
@@ -118,7 +118,7 @@
             </div>
             {% if sprint.status == 'NS' %}
                 <div style="margin: 10px">
-                    <a href="{% url 'start-sprint' user.developing.id %}" class="btn btn-danger">
+                    <a href="{% url 'start-sprint' user.developing.id %}" class="btn btn-dark backDark colored-text">
                         Start Sprint
                     </a>
                 </div>
@@ -128,9 +128,9 @@
         <br/>
         <div class="d-flex flex-column align-items-center justify-content-center w-100 h-100">
             {% if user.developing == product %}
-                <span class="h4">To start development please add a sprint.</span>
+                <span class="h4">{{ end_message }} To start development please add a sprint.</span>
                 <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-sprint' user.developing.id %}"
-                        class="btn btn-danger">
+                        class="btn btn-dark backDark colored-text">
                     Add Sprint
                 </button>
             {% else %}
@@ -182,7 +182,7 @@
         }
 
         $(document).ready(function () {
-            $('#searchbarRight').append("<a href=\"{% url 'pb' product.id %}\" class=\"btn btn-light h4\">Product Backlog</a>")
+            $('#searchbarRight').append("<a href=\"{% url 'pb' product.id %}\" class=\"btn btn-dark h4 backDark colored-text\">Product Backlog</a>")
         });
     </script>
 {% endblock %}

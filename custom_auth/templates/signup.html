@@ -8,14 +8,31 @@
             <img src="{% static "images/logo_transparent_yellow.png" %}" alt="img"
                  class="center"
                  style="width: 400px;">
-
+            {% if form.errors %}
+                <span class="colored-text">
+                    There were some errors in the information you entered. Please correct the following:
+                </span>
+                {% if form.non_field_errors %}<span class="colored-text">{{ form.non_field_errors }}</span>{% endif %}
+                <ul>
+                    {% for field in form %}
+                        {% if field.errors %}
+                            <li class="colored-text">{{ field.label }}: {{ field.errors|striptags }}</li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+            {% endif %}
             <form method="post" action="{% url 'signup' %}"
                   class="w-75 h-50 d-flex flex-column align-items-center justify-content-around">
                 {% csrf_token %}
                 {% render_field form.email placeholder="EMAIL" class+="rounded custom_input" %}
                 {% render_field form.name placeholder="NAME" class+="rounded custom_input" %}
                 {{ form.role }}
-                {% render_field form.password1 placeholder="PASSWORD" class+="rounded custom_input" %}
+                <div class="d-flex flex-row align-items-center justify-content-between" style="width: 350px">
+                    {% render_field form.password1 placeholder="PASSWORD" class+="rounded custom_input" style+="width: 320px" %}
+                    <i class="fa fa-info-circle" style="color: #FFC40C; font-size: 25px" aria-hidden="true"
+                       data-toggle="tooltip" data-html="true" data-placement="right""
+                    title="{{ form.password1.help_text }}"></i>
+                </div>
                 {% render_field form.password2 placeholder="CONFIRM PASSWORD" class+="rounded custom_input" %}
                 <input type="submit" value="SIGNUP" class="btn btn-custom">
                 <p></p>
@@ -27,7 +44,7 @@
     <script>
         document.getElementById('main2').style.padding = '0';
         $(document).ready(function () {
-            console.log($('label'));
+            $('[data-toggle="tooltip"]').tooltip({container: 'body', boundary: 'body'});
             $("label").append("<span class='checkmark'></span>");
         });
     </script>
@@ -69,7 +86,7 @@
             background-color: #FFC40C;
         }
 
-        ul {
+        #id_role {
             list-style-type: none;
             display: flex;
             flex-direction: row;

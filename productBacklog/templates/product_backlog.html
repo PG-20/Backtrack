@@ -92,7 +92,7 @@
         {% endif %}
     </div>
     {% if product.owner == user %}
-        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-danger">
+        <button data-toggle="modal" data-target="#modal" data-url="{% url 'add-pbi' %}" class="btn btn-dark backDark colored-text">
             Add PBI
         </button>
     {% endif %}
@@ -129,7 +129,7 @@
         }
 
         $(document).ready(function () {
-            $('#searchbarRight').append("<a href=\"{% url 'sb' product.id %}\" class=\"btn btn-light h4\">Sprint Backlog</a>");
+            $('#searchbarRight').append("<a href=\"{% url 'sb' product.id %}\" class=\"btn btn-dark h4 backDark colored-text\">Sprint Backlog</a>");
         });
     </script>
 {% endblock %}
